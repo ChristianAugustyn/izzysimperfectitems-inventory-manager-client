@@ -3,10 +3,21 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import CollectionPage from './components/CollectionPage';
+
+const routes = (
+  <Router>
+    <Routes>
+      <Route exact path='/' element={<App/>}/>
+      <Route path='/:collection' element={<CollectionPage/>}/>
+    </Routes>
+  </Router>
+)
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+   {routes}
   </React.StrictMode>,
   document.getElementById('root')
 );
