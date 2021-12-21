@@ -1,9 +1,13 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 
 export default function ProductForm({ children, product}) {
 	let [isOpen, setIsOpen] = useState(false);
     const [fields, setFields] = useState(product)
+
+	useEffect(() => {
+		setFields(product)
+	}, [product])
 
 	function closeModal() {
 		setIsOpen(false);

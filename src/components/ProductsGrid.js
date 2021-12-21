@@ -5,10 +5,18 @@ import ProductCard from './ProductCard';
 
 const ProductsGrid = ({products}) => {
 
+    const [productsInternal, setProdctsInternal] = useState(products)
+
+    useEffect(() => {
+        console.log(`product change`)
+        setProdctsInternal([])
+        setProdctsInternal(products)
+    }, [products])
+
     return (
             <div className='container mx-auto flex flex-wrap'>
                 {
-                    products.length > 0 ? products.map((p, i) => {
+                    productsInternal.length > 0 ? productsInternal.map((p, i) => {
                         return <ProductCard key={i} product={p}/>
                     })
                     :

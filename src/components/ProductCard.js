@@ -1,8 +1,13 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import ProductForm from './ProductForm'
 
 const ProductCard = ({product}) => {
-    const { id, name, imgUrl, price, quantity, type, sale, size } = product
+    const [productInternal, setProductInternal] = useState(product)
+    const { id, name, imgUrl, price, quantity, type, sale, size } = productInternal
+
+    useEffect(() => {
+        setProductInternal(product)
+    },[product])
 
     return (
         <div className='w-1/2 lg:w-1/4 p-4'>
