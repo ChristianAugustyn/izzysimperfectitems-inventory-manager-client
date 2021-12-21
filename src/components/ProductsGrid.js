@@ -3,27 +3,7 @@ import axios from 'axios'
 import { useParams } from '@reach/router';
 import ProductCard from './ProductCard';
 
-const ProductsGrid = () => {
-    const { collection } = useParams()
-
-    const [products, setProducts] = useState([]);
-
-    useEffect(() => {
-        setProducts([])
-        axios.get(`http://localhost:5000/api/product/${collection}`)
-            .then(res => {
-                console.log(collection)
-                return res.data
-            }).then(data =>{
-                console.log("GOT PRODUCT")
-                console.log(data)
-                setProducts(data)
-            }).catch(err => {
-                console.error(err)
-                console.log("didnt get product")
-            })
-
-    }, [collection])
+const ProductsGrid = ({products}) => {
 
     return (
             <div className='container mx-auto flex flex-wrap'>

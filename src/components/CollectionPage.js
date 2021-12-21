@@ -15,12 +15,12 @@ const CollectionPage = () => {
         .then(res => res.data)
         .then(data => setProducts(data))
         .catch(err => console.error(err))
-    }, [])
+    }, [collection])
 
     return (
         <Layout>
             <div>{collection}</div>
-            <ProductsGrid/>
+            <ProductsGrid products={products}/>
         </Layout>
     )
 }

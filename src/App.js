@@ -8,14 +8,21 @@ import { validateToken } from "./components/Auth";
 
 const App = () => {
   const [activeTab, setActiveTab] = useState(0)
-  const [collections, setCollections] = useState([])
+  const [products, setProducts] = useState([])
+
+  useEffect(() => {
+      axios.get(`http://localhost:5000/api/product`)
+      .then(res => res.data)
+      .then(data => setProducts(data))
+      .catch(err => console.error(err))
+  }, [])
 
   return (
       <Layout>
         {/* <button className="btn" onClick={() => login({username: "admin", password: "izzys-admin@2022"})}>Login</button>
         <button className="btn" onClick={() => logout}>logout</button>
         <button className="btn" onClick={() => validateToken()}>validate</button> */}
-        <ProductsGrid/>
+        <ProductsGrid products={products}/>
       </Layout>
   );
 }

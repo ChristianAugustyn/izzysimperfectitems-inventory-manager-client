@@ -36,10 +36,9 @@ const Login = () => {
     }
 
     return (
-        <>
-            <h1>Login page</h1>
-            <div className="p-10 card bg-base-200">
-                <div className="form-control">
+            <div className="container mx-auto flex flex-col items-center justify-center p-10">
+                <h1>Izzys Imperfect Items</h1>
+                <div className="form-control w-full max-w-md">
                     <label className="label">
                     <span className="label-text">Username</span>
                     </label> 
@@ -54,7 +53,6 @@ const Login = () => {
                     error ? <p className='text-red-700'>Login failed, try again</p> : ''
                 }
             </div>
-        </>
     )
 }
 
