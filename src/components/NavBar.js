@@ -8,7 +8,7 @@ const NavBar = () => {
     const [collections, setCollections] = useState([])
 
     useEffect(() => {
-      axios.get('http://localhost:5000/api/product/collections')
+      axios.get('https://izzys-inventory-manager.herokuapp.com/api/product/collections')
         .then(res => {
           return res.data
         }).then(data => {

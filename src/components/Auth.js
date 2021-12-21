@@ -9,7 +9,7 @@ const KEY = "izzys-inventory-manager"
 const login = (credentials) => {
     const { username, password } = credentials
     console.log("LOGGING IN...")
-    return axios.post('http://localhost:5000/api/auth/login', credentials)
+    return axios.post('https://izzys-inventory-manager.herokuapp.com/api/auth/login', credentials)
         .then(res => res.data)
         .then(data => {
             const { id, firstName, lastName, username, token } = data
@@ -40,7 +40,7 @@ const validateToken = () => {
         return false
     }
 
-    return axios.get('http://localhost:5000/api/auth/validate', {
+    return axios.get('https://izzys-inventory-manager.herokuapp.com/api/auth/validate', {
         headers: {
             'Authorization': `Bearer ${sessionInfo.token}`
         }
