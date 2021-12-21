@@ -1,5 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState, useEffect } from "react";
+import noImage from '../images/product_placeholder.png'
 
 export default function ProductForm({ children, product}) {
 	let [isOpen, setIsOpen] = useState(false);
@@ -23,6 +24,11 @@ export default function ProductForm({ children, product}) {
             ...fields,
             [name]: value
         })
+    }
+
+	const handleImageError = (e) => {
+        e.target.onError = null;
+        e.target.src = noImage
     }
 
 	return (
@@ -66,7 +72,7 @@ export default function ProductForm({ children, product}) {
 							<div className="inline-block w-full max-w-2xl max-w-6xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
                                <div className='flex flex-row'>
                                     <div className='w-1/3 mx-3 h-full'>
-                                        <img className=' rounded-md' src={fields.imgUrl}/>
+                                        <img className=' rounded-md' src={fields.imgUrl} onError={handleImageError}/>
                                         <div className='mt-3 flex flex-col'>
                                             <button className='btn btn-sm'>Change Image</button>
                                             <div className='flex flex-col my-4'>
