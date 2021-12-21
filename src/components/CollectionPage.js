@@ -1,8 +1,10 @@
 import axios from 'axios'
 import React, {useState, useEffect} from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams } from '@reach/router'
 import Layout from './Layout'
 import ProductsGrid from './ProductsGrid'
+import { validateToken } from './Auth'
+import { navigate } from '@reach/router'
 
 const CollectionPage = () => {
     const {collection} = useParams()
@@ -13,9 +15,9 @@ const CollectionPage = () => {
         .then(res => res.data)
         .then(data => setProducts(data))
         .catch(err => console.error(err))
-    })
+    }, [])
 
-    return(
+    return (
         <Layout>
             <div>{collection}</div>
             <ProductsGrid/>

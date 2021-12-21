@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { Menu } from '@headlessui/react'
-import { Link } from 'react-router-dom'
+import { Link } from '@reach/router'
 
 const NavBar = () => {
 

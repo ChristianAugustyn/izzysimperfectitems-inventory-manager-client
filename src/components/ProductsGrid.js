@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import axios from 'axios'
-import convertLayerAtRulesToControlComments from 'tailwindcss/lib/lib/convertLayerAtRulesToControlComments';
-import { useParams } from 'react-router-dom';
+import { useParams } from '@reach/router';
 import ProductCard from './ProductCard';
 
 const ProductsGrid = () => {

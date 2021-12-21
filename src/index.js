@@ -1,23 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import CollectionPage from './components/CollectionPage';
+import {login, logout, validateToken, PrivateRoute} from './components/Auth'
+import Login from './components/Login'
+import { Router, Redirect } from "@reach/router"
+
+
 
 const routes = (
-  <Router>
-    <Routes>
-      <Route exact path='/' element={<App/>}/>
-      <Route path='/:collection' element={<CollectionPage/>}/>
-    </Routes>
-  </Router>
+    <Router>
+      <PrivateRoute path='/' component={App}/>
+      <PrivateRoute path="/:collection" component={CollectionPage}/>
+      <Login path='/login'/>
+    </Router>
 )
+
+
+
 
 ReactDOM.render(
   <React.StrictMode>
-   {routes}
+    {routes}
   </React.StrictMode>,
   document.getElementById('root')
 );
