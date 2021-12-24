@@ -1,19 +1,29 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState, useEffect, useRef } from "react";
+import { Fragment, useState, useEffect, useRef, FC, ChangeEvent, SyntheticEvent, useLayoutEffect } from "react";
 import noImage from "../images/product_placeholder.png";
-import axios from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
+import { Product } from "../interfaces";
 
-export default function ProductForm({ children, product }) {
+interface Props {
+	product: Product,
+	children: any
+}
+
+const ProductForm: FC<Props> = ({ children, product }) => {
 	//creates a DOM refference the hidden input field
-	const hiddenInput = useRef(null)
+	const hiddenInput = useRef<HTMLInputElement>(null)
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [fields, setFields] = useState(product);
-	const [file, setFile] = useState(null)
+	const [file, setFile] = useState<File>()
 
 	useEffect(() => {
 		setFields(product);
 	}, [product]);
+
+	useLayoutEffect(() => {
+
+	})
 
 	function closeModal() {
 		setIsOpen(false);
@@ -23,7 +33,7 @@ export default function ProductForm({ children, product }) {
 		setIsOpen(true);
 	}
 
-	const changeFields = (event) => {
+	const changeFields = (event: ChangeEvent<HTMLInputElement>) => {
 		const { name, value, type } = event.target;
 		setFields({
 			...fields,
@@ -31,26 +41,29 @@ export default function ProductForm({ children, product }) {
 		});
 	};
 
-	const handleImageError = (e) => {
-		e.target.onError = null;
-		e.target.src = noImage;
+	const handleImageError = (event: SyntheticEvent<HTMLImageElement, Event>) => {
+		event.currentTarget.src = noImage;
 	};
 
 	const handleFileClick = () => {
 		//when the user clicks the change image button, it clicks hidden input
-		hiddenInput.current.click()
+		if (hiddenInput.current !== null){
+			hiddenInput.current.click()
+		}
 	}
 
-	const handleFileChange = (event) => {
+	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
 		//updates the state of the file uploaded
-		const fileUploaded = event.target.files[0]
-		setFile(fileUploaded)
+		if (event.target.files !== null){
+			const fileUploaded = event.target.files[0]
+			setFile(fileUploaded)
+		}
 	}
 
 	const handleUpdate = () => {
-		const config = {
+		const config: AxiosRequestConfig = {
 			method: 'post',
-			url: `https://izzys-inventory-manager.herokuapp.com/api/product/${fields.collection}/${fields.id}`,
+			url: `http://localhost:5000/api/product/${fields.collection}/${fields.id}`,
 			headers: {
 				'Content-Type': 'application/json'
 			},
@@ -64,6 +77,18 @@ export default function ProductForm({ children, product }) {
 			.catch(err => console.error(err))
 		closeModal()
 	}
+
+	const checkFields = (k: string, v: any): boolean => {
+		if (hasKey(product, k)){
+			return v != product[k]
+		}
+
+		return false
+	}
+
+	function hasKey<O>(obj: O, key: PropertyKey): key is keyof O {
+		return key in obj
+	  }
 
 	return (
 		<>
@@ -128,7 +153,7 @@ export default function ProductForm({ children, product }) {
 											onError={handleImageError}
 										/>
 										<div className="mt-3 flex flex-col">
-											<button type='file' className="btn btn-sm" onClick={handleFileClick}>
+											<button className="btn btn-sm" onClick={handleFileClick}>
 												Change Image
 											</button>
 											<input type='file' className="hidden" ref={hiddenInput} onChange={handleFileChange}/>
@@ -159,9 +184,7 @@ export default function ProductForm({ children, product }) {
 																		disabled={k === "id" || k === "type" || k === "collection"}
 																		name={k}
 																		type={k === 'price' || k === 'quantity' || k === 'sale' ? 'number' : 'text'}
-																		className={`input input-bordered ${
-																			v != product[k] ? "input-warning" : ""
-																		}`}
+																		className={`input input-bordered ${checkFields(k, v) ? "input-warning" : ""}`}
 																		value={v}
 																		onChange={changeFields}
 																	/>
@@ -188,3 +211,5 @@ export default function ProductForm({ children, product }) {
 		</>
 	);
 }
+
+export default ProductForm

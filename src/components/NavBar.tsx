@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FC, KeyboardEvent, ChangeEvent } from "react";
 import axios from "axios";
 import { Menu } from "@headlessui/react";
 import { Link, navigate } from "@reach/router";
 import { logout } from './Auth'
 
-const NavBar = () => {
+const NavBar: FC = () => {
 	const [collections, setCollections] = useState([]);
 	const [search, setSearch] = useState("");
 
 	useEffect(() => {
 		axios
-			.get("https://izzys-inventory-manager.herokuapp.com/api/product/collections")
+			.get("http://localhost:5000/api/product/collections")
 			.then((res) => {
 				return res.data;
 			})
@@ -26,13 +26,13 @@ const NavBar = () => {
 		navigate(`/?name=${search}`);
 	};
 
-	const handleEnter = (event) => {
+	const handleEnter = (event: KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {
 			handleSearch();
 		}
 	};
 
-	const changeSearch = (event) => {
+	const changeSearch = (event: ChangeEvent<HTMLInputElement>) => {
 		const { value } = event.target;
 		setSearch(value);
 	};
@@ -43,15 +43,15 @@ const NavBar = () => {
 	}
 
 	return (
-		<div class="navbar mb-2 bg-red-400">
-			<div class="flex-1 px-2 hidden sm:block lg:flex-none">
-				<Link class="text-lg font-bold cursor-pointer text-white" to="/">
+		<div className="navbar mb-2 bg-red-400">
+			<div className="flex-1 px-2 hidden sm:block lg:flex-none">
+				<Link className="text-lg font-bold cursor-pointer text-white" to="/">
 					Izzys Imperfect Items
 				</Link>
 			</div>
-			<div class="flex justify-end flex-1 px-2">
-				<div class="flex items-stretch">
-					{/* <a class="btn btn-ghost rounded-btn">
+			<div className="flex justify-end flex-1 px-2">
+				<div className="flex items-stretch">
+					{/* <a className="btn btn-ghost rounded-btn">
                       Button
                     </a>  */}
 					<div className="form-control mx-5">
@@ -85,8 +85,8 @@ const NavBar = () => {
 							</button>
 						</div>
 					</div>
-					<div class="dropdown dropdown-end">
-						<div tabindex="0" class="btn btn-ghost rounded-btn">
+					<div className="dropdown dropdown-end">
+						<div tabIndex={0} className="btn btn-ghost rounded-btn">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								className="h-6 w-6"
@@ -104,8 +104,8 @@ const NavBar = () => {
 						</div>
 
 						<ul
-							tabindex="0"
-							class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52"
+							tabIndex={0}
+							className="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52"
 						>
 							{collections.map((c, i) => {
 								return (

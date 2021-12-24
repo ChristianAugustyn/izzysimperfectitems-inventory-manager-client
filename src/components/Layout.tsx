@@ -1,7 +1,7 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, FC} from 'react'
 import NavBar from './NavBar'
 
-const Layout = ({children}) => {
+const Layout: FC = ({children}) => {
     return (
         <>
             <NavBar/>

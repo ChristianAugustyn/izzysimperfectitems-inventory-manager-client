@@ -1,9 +1,14 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, FC} from 'react'
 import axios from 'axios'
 import { useParams } from '@reach/router';
 import ProductCard from './ProductCard';
+import { Product } from '../interfaces';
 
-const ProductsGrid = ({products}) => {
+interface Props {
+    products: Product[]
+}
+
+const ProductsGrid: FC<Props> = ({products}) => {
 
     const [productsInternal, setProdctsInternal] = useState(products)
 

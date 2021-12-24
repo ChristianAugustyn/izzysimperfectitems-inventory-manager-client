@@ -1,10 +1,14 @@
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import resolveConfig from 'tailwindcss/lib/util/resolveConfig'
+import React, { FC, SyntheticEvent, useEffect, useState } from 'react'
 import ProductForm from './ProductForm'
 import noImage from '../images/product_placeholder.png'
+import { Product } from '../interfaces'
 
-const ProductCard = ({product}) => {
+interface Props {
+    product: Product
+}
+
+const ProductCard: FC<Props> = ({product}) => {
     const [productInternal, setProductInternal] = useState(product)
     const { id, name, imgUrl, price, quantity, type, sale, size } = productInternal
 
@@ -12,9 +16,8 @@ const ProductCard = ({product}) => {
         setProductInternal(product)
     },[product])
 
-    const handleImageError = (e) => {
-        e.target.onError = null;
-        e.target.src = noImage
+    const handleImageError = (event: SyntheticEvent<HTMLImageElement, Event>) => {
+        event.currentTarget.src = noImage
     }
 
     return (

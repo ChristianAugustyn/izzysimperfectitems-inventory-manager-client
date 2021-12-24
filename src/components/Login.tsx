@@ -1,21 +1,20 @@
-import React, { useState } from 'react'
-import {login, logout, validateToken} from './Auth'
-import { useNavigate } from '@reach/router';
+import { ChangeEvent, FC, useState } from 'react'
+import {Credentials, login, logout, validateToken} from './Auth'
+import { useNavigate, RouteComponentProps } from '@reach/router';
 
-const startCredentials = {
+const startCredentials: Credentials = {
     username: "",
     password: ""
 }
 
-const Login = () => {
+const Login: FC<RouteComponentProps> = () => {
     const navigate = useNavigate()
 
     const [error, setError] = useState(false)
 
-    const [credentials, setCredentials] = useState(startCredentials)
+    const [credentials, setCredentials] = useState<Credentials>(startCredentials)
 
-    const handleChange = (event) => {
-        
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target
         setCredentials({
             ...credentials,
@@ -23,7 +22,7 @@ const Login = () => {
         })
     }
 
-    const handleLogin = async () => {
+    const handleLogin = async (): Promise<void> => {
         const res = await login(credentials)
         if (res){
             navigate("/")

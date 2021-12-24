@@ -1,20 +1,17 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
-import NavBar from "./components/NavBar";
+import { FC, useEffect, useState } from "react";
 import Layout from "./components/Layout";
 import ProductsGrid from "./components/ProductsGrid";
-import { navigate, useLocation } from "@reach/router";
-import { validateToken } from "./components/Auth";
+import { RouteComponentProps, useLocation } from "@reach/router";
 
-const App = () => {
+const App: FC<RouteComponentProps> = () => {
   const location = useLocation()
-  const [activeTab, setActiveTab] = useState(0)
   const [products, setProducts] = useState([])
 
   console.log(location)
 
   useEffect(() => {
-      axios.get(`https://izzys-inventory-manager.herokuapp.com/api/product${location.search}`)
+      axios.get(`http://localhost:5000/api/product${location.search}`)
       .then(res => res.data)
       .then(data => setProducts(data))
       .catch(err => console.error(err))
