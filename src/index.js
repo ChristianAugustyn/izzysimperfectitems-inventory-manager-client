@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import CollectionPage from './components/CollectionPage';
 import {login, logout, validateToken, PrivateRoute} from './components/Auth'
 import Login from './components/Login'
+import CreateProduct from './components/CreateProduct'
 import { Router, Redirect } from "@reach/router"
 
 
@@ -14,12 +15,10 @@ const routes = (
     <Router>
       <PrivateRoute path='/' component={App}/>
       <PrivateRoute path="/:collection" component={CollectionPage}/>
+      <PrivateRoute path='/create' component={CreateProduct}/>
       <Login path='/login'/>
     </Router>
 )
-
-
-
 
 ReactDOM.render(
   <React.StrictMode>

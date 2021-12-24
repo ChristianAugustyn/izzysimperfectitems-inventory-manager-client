@@ -3,19 +3,22 @@ import { useEffect, useState } from "react";
 import NavBar from "./components/NavBar";
 import Layout from "./components/Layout";
 import ProductsGrid from "./components/ProductsGrid";
-import { navigate } from "@reach/router";
+import { navigate, useLocation } from "@reach/router";
 import { validateToken } from "./components/Auth";
 
 const App = () => {
+  const location = useLocation()
   const [activeTab, setActiveTab] = useState(0)
   const [products, setProducts] = useState([])
 
+  console.log(location)
+
   useEffect(() => {
-      axios.get(`https://izzys-inventory-manager.herokuapp.com/api/product`)
+      axios.get(`https://izzys-inventory-manager.herokuapp.com/api/product${location.search}`)
       .then(res => res.data)
       .then(data => setProducts(data))
       .catch(err => console.error(err))
-  }, [])
+  }, [location.search])
 
   return (
       <Layout>

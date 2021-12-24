@@ -45,7 +45,7 @@ const Login = () => {
                     <label className="label">
                     <span className="label-text">Password</span>
                     </label> 
-                    <input type="text" name='password' placeholder="password" className="input input-ghost" value={credentials.password} onChange={handleChange}/>
+                    <input type="password" name='password' placeholder="password" className="input input-ghost" value={credentials.password} onChange={handleChange}/>
                 </div>
                 <button className='btn' onClick={() => handleLogin()}>Login</button>
                 {

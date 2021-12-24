@@ -7,15 +7,18 @@ import { validateToken } from './Auth'
 import { navigate } from '@reach/router'
 
 const CollectionPage = () => {
-    const {collection} = useParams()
+    const params = useParams()
+    const { collection } = params
     const [products, setProducts] = useState([])
+
+    console.log(params)
 
     useEffect(() => {
         axios.get(`https://izzys-inventory-manager.herokuapp.com/api/product/${collection}`)
         .then(res => res.data)
         .then(data => setProducts(data))
         .catch(err => console.error(err))
-    }, [collection])
+    }, [collection, products])
 
     return (
         <Layout>
