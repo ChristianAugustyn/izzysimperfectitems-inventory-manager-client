@@ -22,6 +22,13 @@ interface AuthResponse {
     token: string
 }
 
+// const createStoredData = (name?: string, token?: string): StoredData => {
+//     return {
+//         name: !!name ? name : '',
+//         token: !!token ? token : ''
+//     }
+// }
+
 const login = (credentials: Credentials) => {
     const { username, password } = credentials
     console.log("LOGGING IN...")
@@ -47,12 +54,14 @@ const logout = () => {
 }
 
 const validateToken = () => {
-    const sessionInfo: StoredData = JSON.parse(localStorage.getItem(KEY) || '')
+    const rawData = localStorage.getItem(KEY)
 
-    if (sessionInfo == null){
+    if (rawData == null){
         // console.log('NO VALIDATION SESSION')
         return false
     }
+
+    const sessionInfo: StoredData = JSON.parse(rawData)
 
     if (!sessionInfo.token){
         // console.log("NO VALID TOKEN PRESENT")
