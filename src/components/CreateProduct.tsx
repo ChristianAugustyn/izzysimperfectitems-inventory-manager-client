@@ -17,7 +17,7 @@ const CreateProduct = () => {
     const [form, setForm] = useState(blankForm)
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/api/product/types`)
+        axios.get(`https://izzys-inventory-manager.herokuapp.com/api/product/types`)
             .then(res => res.data)
             .then(data => setTypes(data))
             .catch(err => console.error(err))
