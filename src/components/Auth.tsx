@@ -22,14 +22,7 @@ interface AuthResponse {
     token: string
 }
 
-// const createStoredData = (name?: string, token?: string): StoredData => {
-//     return {
-//         name: !!name ? name : '',
-//         token: !!token ? token : ''
-//     }
-// }
-
-const login = (credentials: Credentials) => {
+const login = (credentials: Credentials): Promise<boolean> => {
     const { username, password } = credentials
     console.log("LOGGING IN...")
     return axios.post('https://izzys-inventory-manager.herokuapp.com/api/auth/login', credentials)

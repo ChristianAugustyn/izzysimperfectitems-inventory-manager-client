@@ -11,14 +11,13 @@ const CollectionPage: FC<RouteComponentProps> = () => {
     const { collection } = params
     const [products, setProducts] = useState([])
 
-    console.log(params)
-
     useEffect(() => {
         axios.get(`https://izzys-inventory-manager.herokuapp.com/api/product/${collection}`)
         .then(res => res.data)
         .then(data => setProducts(data))
         .catch(err => console.error(err))
-    }, [collection, products])
+        console.log(collection, products)
+    }, [collection])
 
     return (
         <Layout>

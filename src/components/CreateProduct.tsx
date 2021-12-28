@@ -1,5 +1,5 @@
 import axios from 'axios'
-import React, { useState, useEffect, ChangeEvent } from 'react'
+import React, { useState, useEffect, ChangeEvent, FC } from 'react'
 import Layout from './Layout'
 
 const blankForm = {
@@ -11,9 +11,10 @@ const blankForm = {
     sale: 0
 }
 
-const CreateProduct = () => {
+const CreateProduct: FC = () => {
 
-    const [types, setTypes] = useState([])
+    const [types, setTypes] = useState<string[]>([])
+    const [collections, setCollections] = useState<string[]>([])
     const [form, setForm] = useState(blankForm)
 
     useEffect(() => {
@@ -21,6 +22,11 @@ const CreateProduct = () => {
             .then(res => res.data)
             .then(data => setTypes(data))
             .catch(err => console.error(err))
+    
+        axios.get(`https://izzys-inventory-manager.herokuapp.com/api/product/collections`)
+            .then(res => res.data)
+            .then(data => setCollections(data))
+            .catch(err => console.error(err)) 
     }, [])
 
     const handleFormChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => {
@@ -34,7 +40,7 @@ const CreateProduct = () => {
 
     return (
         <Layout>
-            <div className="form-control">
+            <div className="container flex mx-auto px-5 form-control">
                 <label className="label">
                     <span className="label-text">Name</span>
                 </label> 
