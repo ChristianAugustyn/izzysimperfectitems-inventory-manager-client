@@ -70,7 +70,7 @@ const ProductForm: FC<Props> = ({ children, product, handleProductChange }) => {
 	const handleUpdate = () => {
 		const config: AxiosRequestConfig = {
 			method: 'post',
-			url: `http://localhost:5000/api/product/${fields.collection}/${fields.id}`,
+			url: `https://izzys-inventory-manager.herokuapp.com/api/product/${fields.collection}/${fields.id}`,
 			headers: {
 				'Content-Type': 'application/json'
 			},

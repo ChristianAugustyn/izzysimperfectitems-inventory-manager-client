@@ -10,7 +10,7 @@ const App: FC<RouteComponentProps> = () => {
   const [products, setProducts] = useState<Product[]>([])
 
   useEffect(() => {
-      axios.get(`http://localhost:5000/api/product${location.search}`)
+      axios.get(`https://izzys-inventory-manager.herokuapp.com/api/product${location.search}`)
       .then(res => res.data)
       .then(data => setProducts(data))
       .catch(err => console.error(err))

@@ -12,7 +12,7 @@ const CollectionPage: FC<RouteComponentProps> = () => {
     const [products, setProducts] = useState([])
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/api/product/${collection}`)
+        axios.get(`https://izzys-inventory-manager.herokuapp.com/api/product/${collection}`)
         .then(res => res.data)
         .then(data => setProducts(data))
         .catch(err => console.error(err))

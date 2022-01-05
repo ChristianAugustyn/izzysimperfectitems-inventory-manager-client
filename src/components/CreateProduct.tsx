@@ -18,12 +18,12 @@ const CreateProduct: FC = () => {
     const [form, setForm] = useState(blankForm)
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/api/product/types`)
+        axios.get(`https://izzys-inventory-manager.herokuapp.com/api/product/types`)
             .then(res => res.data)
             .then(data => setTypes(data))
             .catch(err => console.error(err))
     
-        axios.get(`http://localhost:5000/api/product/collections`)
+        axios.get(`https://izzys-inventory-manager.herokuapp.com/api/product/collections`)
             .then(res => res.data)
             .then(data => setCollections(data))
             .catch(err => console.error(err)) 

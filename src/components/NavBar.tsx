@@ -10,7 +10,7 @@ const NavBar: FC = () => {
 
 	useEffect(() => {
 		axios
-			.get("http://localhost:5000/api/product/collections")
+			.get("https://izzys-inventory-manager.herokuapp.com/api/product/collections")
 			.then((res) => {
 				return res.data;
 			})
