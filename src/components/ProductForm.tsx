@@ -6,15 +6,16 @@ import { Product } from "../interfaces";
 
 interface Props {
 	product: Product,
+	handleProductChange: (product: Product) => void,
 	children: any
 }
 
-const ProductForm: FC<Props> = ({ children, product }) => {
+const ProductForm: FC<Props> = ({ children, product, handleProductChange }) => {
 	//creates a DOM refference the hidden input field
 	const hiddenInput = useRef<HTMLInputElement>(null)
 
 	const [isOpen, setIsOpen] = useState(false);
-	const [fields, setFields] = useState(product);
+	const [fields, setFields] = useState<Product>(product);
 	const [file, setFile] = useState<File>()
 
 	useEffect(() => {
@@ -70,10 +71,10 @@ const ProductForm: FC<Props> = ({ children, product }) => {
 			data: JSON.stringify(fields)
 		}
 
-		console.log(config)
-
 		axios(config)
-			.then(res => console.log("successfully updated"))
+			.then(res => {
+				handleProductChange(fields)
+			})
 			.catch(err => console.error(err))
 		closeModal()
 	}
@@ -88,7 +89,7 @@ const ProductForm: FC<Props> = ({ children, product }) => {
 
 	function hasKey<O>(obj: O, key: PropertyKey): key is keyof O {
 		return key in obj
-	  }
+	}
 
 	return (
 		<>

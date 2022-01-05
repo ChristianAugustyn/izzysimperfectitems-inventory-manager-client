@@ -5,10 +5,11 @@ import noImage from '../images/product_placeholder.png'
 import { Product } from '../interfaces'
 
 interface Props {
-    product: Product
+    product: Product,
+    handleProductsChange: (product: Product) => void
 }
 
-const ProductCard: FC<Props> = ({product}) => {
+const ProductCard: FC<Props> = ({product, handleProductsChange}) => {
     const [productInternal, setProductInternal] = useState(product)
     const { id, name, imgUrl, price, quantity, type, sale, size } = productInternal
 
@@ -20,9 +21,17 @@ const ProductCard: FC<Props> = ({product}) => {
         event.currentTarget.src = noImage
     }
 
+    const handleProductChange = (product: Product) => {
+        //updates components state
+        //react needs to see a new object in order to re-render
+        setProductInternal({...product})
+        //updates grids products state
+        handleProductsChange(product)
+    }
+
     return (
         <div className='w-1/2 lg:w-1/4 p-4'>
-            <ProductForm product={product}>
+            <ProductForm product={product} handleProductChange={handleProductChange}>
                 <div className='w-full h-full'>
                     <img src={imgUrl} onError={handleImageError}/>
                 </div>
