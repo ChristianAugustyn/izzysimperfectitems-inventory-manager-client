@@ -67,19 +67,39 @@ const ProductForm: FC<Props> = ({ children, product, handleProductChange }) => {
 		})
 	}
 
-	const handleUpdate = () => {
+	const handleUpdate = async () => {
+		let newFields: Product | null = null
+		//check for an added image
+		if (file !== undefined) {
+			const formData = new FormData()
+			formData.append("image", file, file.name)
+			formData.append("collection", fields.collection)
+			//create new image
+			const imgConfig: AxiosRequestConfig = {
+				method: 'post',
+				url: 'https://izzys-inventory-manager.herokuapp.com/api/bucket/objects',
+				data: formData
+			}
+
+			
+			await axios(imgConfig)
+				.then(res => res.data)
+				.then(data => newFields = {...fields, imgUrl: data})
+				.catch(err => console.error(err))
+		}
+		console.log(newFields)
+		//update the product
 		const config: AxiosRequestConfig = {
 			method: 'post',
 			url: `https://izzys-inventory-manager.herokuapp.com/api/product/${fields.collection}/${fields.id}`,
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			data: JSON.stringify(fields)
+			data: JSON.stringify(!!newFields ? newFields : fields)
 		}
-
-		axios(config)
+		await axios(config)
 			.then(res => {
-				handleProductChange(fields)
+				handleProductChange(!!newFields ? newFields : fields)
 			})
 			.catch(err => console.error(err))
 		closeModal()
