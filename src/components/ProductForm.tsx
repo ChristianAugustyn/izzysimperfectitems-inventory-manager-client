@@ -55,16 +55,22 @@ const ProductForm: FC<Props> = ({ children, product, handleProductChange }) => {
 
 	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
 		//updates the state of the file uploaded
-		if (event.target.files !== null){
-			const fileUploaded = event.target.files[0]
-			setFile(fileUploaded)
+		if (event.target.files === null){
+			return
 		}
+
+		const fileUploaded = event.target.files[0]
+		setFile(fileUploaded)
+		setFields({
+			...fields,
+			imgUrl: URL.createObjectURL(fileUploaded)
+		})
 	}
 
 	const handleUpdate = () => {
 		const config: AxiosRequestConfig = {
 			method: 'post',
-			url: `https://izzys-inventory-manager.herokuapp.com/api/product/${fields.collection}/${fields.id}`,
+			url: `http://localhost:5000/api/product/${fields.collection}/${fields.id}`,
 			headers: {
 				'Content-Type': 'application/json'
 			},

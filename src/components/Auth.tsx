@@ -25,7 +25,7 @@ interface AuthResponse {
 const login = (credentials: Credentials): Promise<boolean> => {
     const { username, password } = credentials
     console.log("LOGGING IN...")
-    return axios.post('https://izzys-inventory-manager.herokuapp.com/api/auth/login', credentials)
+    return axios.post('http://localhost:5000/api/auth/login', credentials)
         .then(res => res.data as AuthResponse)
         .then(data => {
             const { token, firstName } = data
@@ -61,7 +61,7 @@ const validateToken = () => {
         return false
     }
 
-    return axios.get('https://izzys-inventory-manager.herokuapp.com/api/auth/validate', {
+    return axios.get('http://localhost:5000/api/auth/validate', {
         headers: {
             'Authorization': `Bearer ${sessionInfo.token}`
         }
