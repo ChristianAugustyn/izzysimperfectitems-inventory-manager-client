@@ -16,12 +16,10 @@ const CollectionPage: FC<RouteComponentProps> = () => {
         .then(res => res.data)
         .then(data => setProducts(data))
         .catch(err => console.error(err))
-        console.log(collection, products)
     }, [collection])
 
     return (
         <Layout>
-            <div>{collection}</div>
             <ProductsGrid products={products}/>
         </Layout>
     )

@@ -9,3 +9,13 @@ export interface Product {
     size: string,
     collection: string
 }
+
+export interface newProduct {
+    name: string,
+    imgUrl: string,
+    price: number,
+    quantity: number,
+    type: string,
+    sale: number,
+    size: string
+}

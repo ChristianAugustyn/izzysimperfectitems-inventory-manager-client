@@ -7,9 +7,10 @@ import { Product } from '../interfaces'
 interface Props {
     product: Product,
     handleProductsChange: (product: Product) => void
+    handleProductsDeleted: (product: Product) => void
 }
 
-const ProductCard: FC<Props> = ({product, handleProductsChange}) => {
+const ProductCard: FC<Props> = ({product, handleProductsChange, handleProductsDeleted}) => {
     const [productInternal, setProductInternal] = useState(product)
     const { id, name, imgUrl, price, quantity, type, sale, size } = productInternal
 
@@ -29,9 +30,13 @@ const ProductCard: FC<Props> = ({product, handleProductsChange}) => {
         handleProductsChange(product)
     }
 
+    const handleProductDeleted = (product: Product) => {
+        handleProductsDeleted(product)
+    }
+
     return (
         <div className='w-1/2 lg:w-1/4 p-4'>
-            <ProductForm product={product} handleProductChange={handleProductChange}>
+            <ProductForm product={product} handleProductChange={handleProductChange} handleProductDeleted={handleProductDeleted}>
                 <div className='w-full h-full'>
                     <img src={imgUrl} onError={handleImageError}/>
                 </div>

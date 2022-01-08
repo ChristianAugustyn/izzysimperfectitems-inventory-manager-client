@@ -24,7 +24,6 @@ interface AuthResponse {
 
 const login = (credentials: Credentials): Promise<boolean> => {
     const { username, password } = credentials
-    console.log("LOGGING IN...")
     return axios.post('https://izzys-inventory-manager.herokuapp.com/api/auth/login', credentials)
         .then(res => res.data as AuthResponse)
         .then(data => {
@@ -75,6 +74,16 @@ const validateToken = () => {
     })
 }
 
+const getSessionInfo = (): StoredData | null => {
+    const raw = localStorage.getItem(KEY)
+    if (raw == null) {
+        return null
+    }
+    const sessionInfo: StoredData = JSON.parse(raw)
+    return sessionInfo
+
+}
+
 interface ProtectedProps extends RouteComponentProps {
     component: React.FC<RouteComponentProps>
 }
@@ -92,5 +101,6 @@ export {
     login,
     logout,
     validateToken,
-    PrivateRoute
+    PrivateRoute,
+    getSessionInfo
 }

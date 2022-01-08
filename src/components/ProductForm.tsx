@@ -3,14 +3,16 @@ import { Fragment, useState, useEffect, useRef, FC, ChangeEvent, SyntheticEvent,
 import noImage from "../images/product_placeholder.png";
 import axios, { AxiosRequestConfig } from 'axios'
 import { Product } from "../interfaces";
+import { getSessionInfo } from "./Auth";
 
 interface Props {
 	product: Product,
 	handleProductChange: (product: Product) => void,
+	handleProductDeleted: (product: Product) => void,
 	children: any
 }
 
-const ProductForm: FC<Props> = ({ children, product, handleProductChange }) => {
+const ProductForm: FC<Props> = ({ children, product, handleProductChange, handleProductDeleted }) => {
 	//creates a DOM refference the hidden input field
 	const hiddenInput = useRef<HTMLInputElement>(null)
 
@@ -22,9 +24,9 @@ const ProductForm: FC<Props> = ({ children, product, handleProductChange }) => {
 		setFields(product);
 	}, [product]);
 
-	useLayoutEffect(() => {
+	// useLayoutEffect(() => {
 
-	})
+	// })
 
 	function closeModal() {
 		setIsOpen(false);
@@ -68,6 +70,12 @@ const ProductForm: FC<Props> = ({ children, product, handleProductChange }) => {
 	}
 
 	const handleUpdate = async () => {
+		const session = getSessionInfo()
+
+        if (session == null) {
+            return
+        }
+
 		let newFields: Product | null = null
 		//check for an added image
 		if (file !== undefined) {
@@ -87,12 +95,12 @@ const ProductForm: FC<Props> = ({ children, product, handleProductChange }) => {
 				.then(data => newFields = {...fields, imgUrl: data})
 				.catch(err => console.error(err))
 		}
-		console.log(newFields)
 		//update the product
 		const config: AxiosRequestConfig = {
 			method: 'post',
 			url: `https://izzys-inventory-manager.herokuapp.com/api/product/${fields.collection}/${fields.id}`,
 			headers: {
+				'Authorization': `Bearer ${session.token}`,
 				'Content-Type': 'application/json'
 			},
 			data: JSON.stringify(!!newFields ? newFields : fields)
@@ -103,6 +111,31 @@ const ProductForm: FC<Props> = ({ children, product, handleProductChange }) => {
 			})
 			.catch(err => console.error(err))
 		closeModal()
+	}
+
+	const handleDelete = async () => {
+		const session = getSessionInfo()
+
+        if (session == null) {
+            return
+        }
+		//TODO: fix something related to cors error just for deleting the product
+		const config: AxiosRequestConfig = {
+			method: 'delete',
+			url: `https://izzys-inventory-manager.herokuapp.com/api/product/${fields.collection}/${fields.id}`,
+			headers: {
+				'Authorization': `Bearer ${session.token}`,
+				'Content-Type': 'application/json'
+			},
+			data: JSON.stringify(fields)
+		}
+
+		await axios(config)
+			.then(res => {
+				handleProductDeleted(fields)
+				closeModal()
+			})
+			.catch(err => console.error(err))
 	}
 
 	const checkFields = (k: string, v: any): boolean => {
@@ -186,7 +219,7 @@ const ProductForm: FC<Props> = ({ children, product, handleProductChange }) => {
 											<input type='file' className="hidden" ref={hiddenInput} onChange={handleFileChange}/>
 											<div className="hidden md:flex flex-col my-4">
 												<button className="btn btn-success my-1" onClick={() => handleUpdate()}>Update</button>
-												<button className="btn btn-error btn-outline btn-xs my-1">
+												<button className="btn btn-error btn-outline btn-xs my-1" onClick={handleDelete}>
 													Delete
 												</button>
 											</div>
@@ -224,7 +257,7 @@ const ProductForm: FC<Props> = ({ children, product, handleProductChange }) => {
 										</table>
 										<div className="flex md:hidden flex-col my-4">
 											<button className="btn btn-success my-1" onClick={() => handleUpdate()}>Update</button>
-											<button className="btn btn-error btn-outline btn-xs my-1">
+											<button className="btn btn-error btn-outline btn-xs my-1" onClick={handleDelete}>
 												Delete
 											</button>
 										</div>

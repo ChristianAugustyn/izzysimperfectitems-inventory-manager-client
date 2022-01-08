@@ -12,6 +12,8 @@ const Login: FC<RouteComponentProps> = () => {
 
     const [error, setError] = useState(false)
 
+    const [loading, setLoading] = useState(false)
+
     const [credentials, setCredentials] = useState<Credentials>(startCredentials)
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -23,11 +25,13 @@ const Login: FC<RouteComponentProps> = () => {
     }
 
     const handleLogin = async (): Promise<void> => {
+        setLoading(true)
         const res = await login(credentials)
         if (res){
             navigate("/")
         }
         else {
+            setLoading(false)
             setError(true)
             setCredentials(startCredentials)
         }
@@ -49,6 +53,14 @@ const Login: FC<RouteComponentProps> = () => {
                 <button className='btn' onClick={() => handleLogin()}>Login</button>
                 {
                     error ? <p className='text-red-700'>Login failed, try again</p> : ''
+                }
+                {
+                    loading ? (
+                        <div className='flex flex-row items-center my-3'>
+                            <svg className='animate-spin h-6 w-6 feather feather-refresh-cw mr-2' xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                            <p>Loading...</p>
+                        </div>
+                    ) : ''
                 }
             </div>
     )
