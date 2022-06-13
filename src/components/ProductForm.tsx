@@ -85,7 +85,7 @@ const ProductForm: FC<Props> = ({ children, product, handleProductChange, handle
 			//create new image
 			const imgConfig: AxiosRequestConfig = {
 				method: 'post',
-				url: 'https://izzys-inventory-manager.herokuapp.com/api/bucket/objects',
+				url: 'http://localhost:5000/api/bucket/objects',
 				data: formData
 			}
 
@@ -98,7 +98,7 @@ const ProductForm: FC<Props> = ({ children, product, handleProductChange, handle
 		//update the product
 		const config: AxiosRequestConfig = {
 			method: 'post',
-			url: `https://izzys-inventory-manager.herokuapp.com/api/product/${fields.collection}/${fields.id}`,
+			url: `http://localhost:5000/api/product/${fields.collection}/${fields.id}`,
 			headers: {
 				'Authorization': `Bearer ${session.token}`,
 				'Content-Type': 'application/json'
@@ -122,7 +122,7 @@ const ProductForm: FC<Props> = ({ children, product, handleProductChange, handle
 		//TODO: fix something related to cors error just for deleting the product
 		const config: AxiosRequestConfig = {
 			method: 'delete',
-			url: `https://izzys-inventory-manager.herokuapp.com/api/product/${fields.collection}/${fields.id}`,
+			url: `http://localhost:5000/api/product/${fields.collection}/${fields.id}`,
 			headers: {
 				'Authorization': `Bearer ${session.token}`,
 				'Content-Type': 'application/json'

@@ -6,7 +6,7 @@ import CollectionPage from './components/CollectionPage';
 import {login, logout, validateToken, PrivateRoute} from './components/Auth'
 import Login from './components/Login'
 import CreateProduct from './components/CreateProduct'
-import { Router, Redirect } from "@reach/router"
+import { Router , Redirect } from "@reach/router"
 
 
 

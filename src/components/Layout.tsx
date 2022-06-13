@@ -1,7 +1,11 @@
 import React, {useState, useEffect, FC} from 'react'
 import NavBar from './NavBar'
 
-const Layout: FC = ({children}) => {
+type LayoutProps = {
+    children: React.ReactNode
+}
+
+const Layout: FC<LayoutProps> = ({children}) => {
     return (
         <>
             <NavBar/>

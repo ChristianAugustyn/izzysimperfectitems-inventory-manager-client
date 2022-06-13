@@ -30,12 +30,12 @@ const CreateProduct: FC = () => {
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        axios.get(`https://izzys-inventory-manager.herokuapp.com/api/product/types`)
+        axios.get(`http://localhost:5000/api/product/types`)
             .then(res => res.data)
             .then(data => setTypes(data))
             .catch(err => console.error(err))
     
-        axios.get(`https://izzys-inventory-manager.herokuapp.com/api/product/collections`)
+        axios.get(`http://localhost:5000/api/product/collections`)
             .then(res => res.data)
             .then(data => setCollections(data))
             .catch(err => console.error(err)) 
@@ -90,7 +90,7 @@ const CreateProduct: FC = () => {
         //create new image
         const imgConfig: AxiosRequestConfig = {
             method: 'post',
-            url: 'https://izzys-inventory-manager.herokuapp.com/api/bucket/objects',
+            url: 'http://localhost:5000/api/bucket/objects',
             data: formData
         }
 
@@ -117,7 +117,7 @@ const CreateProduct: FC = () => {
 
         const config: AxiosRequestConfig = {
 			method: 'post',
-			url: `https://izzys-inventory-manager.herokuapp.com/api/product/${mapTypeToCollection(form.type)}`,
+			url: `http://localhost:5000/api/product/${mapTypeToCollection(form.type)}`,
 			headers: {
                 'Authorization': `Bearer ${session.token}`,
 				'Content-Type': 'application/json'
