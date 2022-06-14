@@ -14,30 +14,30 @@ interface Props {
 
 const ProductsGrid: FC<Props> = ({products}) => {
 
-    // const [productsInternal, setProductsInternal] = useState<Product[]>(products)
+    const [productsInternal, setProductsInternal] = useState<ProductInfo[]>(products)
 
-    // useEffect(() => {
-    //     setProductsInternal([])
-    //     setProductsInternal(products)
-    // }, [products])
+    useEffect(() => {
+        setProductsInternal([])
+        setProductsInternal(products)
+    }, [products])
 
-    // const handleProductsChange = (product: Product) => {
-    //     //TODO: FINISH THIS PRODUCTS MATCHER
-    //     const index = productsInternal.findIndex(p => p.id === product.id)
-    //     const update = productsInternal
-    //     update[index] = product
-    //     //react needs to see a new object in order to re-render
-    //     setProductsInternal([...update])
-    // }
+    const handleProductsChange = (product: ProductInfo) => {
+        //TODO: FINISH THIS PRODUCTS MATCHER
+        const index = productsInternal.findIndex(p => p.id === product.id)
+        const update = productsInternal
+        update[index] = product
+        //react needs to see a new object in order to re-render
+        setProductsInternal([...update])
+    }
 
-    // const handleProductsDeleted = (product: Product) => {
-    //     const index = productsInternal.findIndex(p => p.id === product.id)
-    //     const update = productsInternal
-    //     if (index > -1) {
-    //         update.splice(index, 1)
-    //     }
-    //     setProductsInternal([...update])
-    // }
+    const handleProductsDeleted = (product: ProductInfo) => {
+        const index = productsInternal.findIndex(p => p.id === product.id)
+        const update = productsInternal
+        if (index > -1) {
+            update.splice(index, 1)
+        }
+        setProductsInternal([...update])
+    }
 
     // return (
     //         <div className='container mx-auto flex flex-wrap'>
@@ -51,17 +51,11 @@ const ProductsGrid: FC<Props> = ({products}) => {
     //         </div>
     // )
 
-    const [productsInternal, setProductsInternal] = useState<ProductInfo[]>(products)
-    useEffect(() => {
-        setProductsInternal([])
-        setProductsInternal(products)
-    }, [products])
-
     return (
         <div className='container mx-auto flex flex-wrap'>
             {
                 productsInternal.length > 0 ? productsInternal.map((p, i) => {
-                    return <img src={p.images[0].imgUrl} alt={p.name}/>
+                    return <ProductCard key={i} product={p} handleProductsChange={handleProductsChange} handleProductsDeleted={handleProductsDeleted}/>
                 })
                 :
                 ''

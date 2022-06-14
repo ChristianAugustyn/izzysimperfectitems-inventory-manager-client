@@ -11,7 +11,7 @@ const App: FC<RouteComponentProps> = () => {
   const [products, setProducts] = useState<ProductInfo[]>([])
 
   useEffect(() => {
-      axios.get(`http://localhost:5000/api/v2/product`)
+      axios.get(`http://localhost:5000/api/v2/products`)
       .then((res: AxiosResponse) => res.data)
       .then((data: ProductInfo[]) => setProducts(data))
       .catch(err => console.error(err))

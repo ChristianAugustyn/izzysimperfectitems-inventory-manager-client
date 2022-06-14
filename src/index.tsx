@@ -7,12 +7,14 @@ import {login, logout, validateToken, PrivateRoute} from './components/Auth'
 import Login from './components/Login'
 import CreateProduct from './components/CreateProduct'
 import { Router , Redirect } from "@reach/router"
+import ProductPage from './components/ProductPage';
 
 
 
 const routes = (
     <Router>
       <PrivateRoute path='/' component={App}/>
+      <PrivateRoute path='/products/:productId' component={ProductPage} />
       <PrivateRoute path="/:collection" component={CollectionPage}/>
       <PrivateRoute path='/create' component={CreateProduct}/>
       <Login path='/login'/>
