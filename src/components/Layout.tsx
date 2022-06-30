@@ -9,7 +9,7 @@ const Layout: FC<LayoutProps> = ({children}) => {
     return (
         <>
             <NavBar/>
-            <main className='h-full w-full'>
+            <main className='relative h-full w-full'>
                 {children}
             </main>
             {/* <div className='absolute bottom-0 right-0 left-0 w-full flex flex-row justify-center items-center'>

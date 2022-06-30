@@ -56,7 +56,7 @@ export interface ProductVariation {
     quantity: number,
     price: number,
     displayOrder: number,
-    size: Size
+    size: Size | null
 }
 
 export interface ProductImage {
