@@ -44,6 +44,10 @@ const ProductPage: FC<RouteComponentProps> = () => {
             })
     }, []);
 
+    useEffect(() => {
+        console.log(product?.variations)
+    }, [product?.variations])
+
     // EVENT HANDLERS
     const handleProductInfoChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { id, value } = event.target;
@@ -136,7 +140,7 @@ const ProductPage: FC<RouteComponentProps> = () => {
         }
 
         if (product.variations.length <= 1) {
-            alert("a product must have at least 1 variation");
+            alert("a product must have at least one variation");
             return;
         }
 
@@ -154,6 +158,46 @@ const ProductPage: FC<RouteComponentProps> = () => {
        axios.delete(`http://localhost:5000/api/v2/products/${product.id}/variations?${queryString}`)
         .then((res: AxiosResponse) => window.location.reload())
         .catch(err => console.error(err));
+    }
+
+    const handleVariationChanges = (event: ChangeEvent<HTMLInputElement>) => {
+        const { value, type } = event.target;
+        const property = event.target.getAttribute("data-variation-property");
+        const variationId = event.target.getAttribute('data-variation-id');
+
+        if  (product === undefined || property === null) {
+            return;
+        }
+
+        var parsedValue: string | number = value;
+
+        if (type === "number") {
+            parsedValue = parseFloat(value);
+        }
+
+        //find and modify variation
+        var index = product.variations.findIndex(v => v.id === variationId);
+        var variation: ProductVariation = product.variations[index];
+        variation = {
+            ...variation,
+            [property]: parsedValue
+        }
+
+        //remove existing variations and add updated version
+        var variations = product.variations.filter(v => v.id !== variation.id);
+        variations.push(variation);
+
+        setProduct({ ...product, variations: variations});
+    }
+
+    const handleSaveVariationChanges = () => {
+        if (product === undefined) {
+            return;
+        }
+
+        axios.put(`http://localhost:5000/api/v2/products/variations`, product.variations)
+            .then((res: AxiosResponse) => alert(`${res.status} : ${res.statusText}`))
+            .catch(err => console.error(err));
     }
 
 
@@ -180,6 +224,7 @@ const ProductPage: FC<RouteComponentProps> = () => {
                         </div>
                     </div>
                     <div className='w-2/3 p-4'>
+                        {/* Product Info Row 1 */}
                         <div className='flex flex-row'>
                             <div className='form-control w-1/2 p-4'>
                                 <label className='label'><span className='label-text'>Product Id</span></label>
@@ -190,6 +235,7 @@ const ProductPage: FC<RouteComponentProps> = () => {
                                 <input id='name' type="text" placeholder="Id" className="input input-bordered w-full " value={product.name} onChange={handleProductInfoChange}/>
                             </div>
                         </div>
+                        {/* Product Info Row 2 */}
                         <div className='flex flex-row'>
                             <div className='form-control w-1/2 p-4 '>
                                 <label className='label'><span className='label-text'>Description</span></label>
@@ -213,8 +259,9 @@ const ProductPage: FC<RouteComponentProps> = () => {
                             </div>
                         </div>
                         {/* VARIATIONS */}
-                        <div className='flex flex-row justify-end p-4'>
-                            <button className="btn btn-error btn-md" onClick={handleDeleteVariations}>Delete Variation(s)</button>
+                        <div className='flex flex-row p-4'>
+                            <button className="btn btn-error btn-md mr-4" onClick={handleDeleteVariations}>Delete Variation(s)</button>
+                            <button className="btn btn-success btn-md mr-4" onClick={handleSaveVariationChanges}>Save Changes</button>
                         </div>
                         <div className='overflow-x-auto w-full p-4'>
                             <table className='table w-full'>
@@ -240,9 +287,9 @@ const ProductPage: FC<RouteComponentProps> = () => {
                                                         <input id={variation.id} type="checkbox" className="checkbox"  checked={checkedVariations[variation.id]} onChange={handleCheckVariation}/>
                                                     </label>
                                                 </th>
-                                                <td>$<input type="text" placeholder="0.00" className="input input-ghost w-full" value={variation.price.toFixed(2)}/></td>
-                                                <td><input type="text" placeholder="0" className="input input-ghost w-full" value={variation.quantity}/></td>
-                                                <td><input type="text" placeholder="0" className="input input-ghost w-full" value={variation.discountId || "None"}/></td>
+                                                <td>$<input data-variation-id={variation.id} data-variation-property='price' type="number" step="0.1" placeholder="0.00" className="input input-ghost w-full" value={variation.price} onChange={handleVariationChanges}/></td>
+                                                <td><input data-variation-id={variation.id} data-variation-property='quantity' type="number" step="1" placeholder="0" className="input input-ghost w-full" value={variation.quantity} onChange={handleVariationChanges}/></td>
+                                                <td><input data-variation-id={variation.id} data-variation-property='discountId' type="text" placeholder="0" className="input input-ghost w-full" value={variation.discountId || "None"} onChange={handleVariationChanges}/></td>
                                                 <td>
                                                     <select id={variation.id} className="select select-ghost w-full" onChange={handleVariationSizeSelect}>
                                                         <option>None</option>
