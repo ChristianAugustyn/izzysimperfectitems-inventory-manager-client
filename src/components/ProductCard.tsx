@@ -24,28 +24,16 @@ const ProductCard: FC<Props> = ({product, handleProductsChange, handleProductsDe
         event.currentTarget.src = noImage
     }
 
-    const handleProductChange = (product: ProductInfo) => {
-        //updates components state
-        //react needs to see a new object in order to re-render
-        setProductInternal({...product})
-        //updates grids products state
-        handleProductsChange(product)
-    }
-
-    const handleProductDeleted = (product: ProductInfo) => {
-        handleProductsDeleted(product)
-    }
-
     return (
-        <div className='w-1/2 lg:w-1/4 p-4'>
+        <div className='w-1/2 h-full lg:w-1/4 p-4'>
             {/* <ProductForm product={product} handleProductChange={handleProductChange} handleProductDeleted={handleProductDeleted}> */}
             <Link to={`/products/${id}`}>
                 <div className='w-full h-full'>
                     <img src={images[0].imgUrl} onError={handleImageError} alt={images[0].id}/>
                 </div>
                 <div className='"m-4 flex flex-col flex-nowrap justify-between content-center'>
-                    <h2 className='text-gray-500 uppercase'>{name}</h2>
-                    <p className='truncate'>{id}</p>
+                    <h2 className='font-medium uppercase'>{name}</h2>
+                    <p className='truncate text-gray-400'>{id}</p>
                 </div>
             {/* </ProductForm> */}
             </Link>

@@ -15,7 +15,7 @@ const routes = (
     <Router>
       <PrivateRoute path='/' component={App}/>
       <PrivateRoute path='/products/:productId' component={ProductPage} />
-      <PrivateRoute path="/:collection" component={CollectionPage}/>
+      <PrivateRoute path="/:category" component={CollectionPage}/>
       <PrivateRoute path='/create' component={CreateProduct}/>
       <Login path='/login'/>
     </Router>

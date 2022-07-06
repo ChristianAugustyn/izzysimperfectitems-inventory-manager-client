@@ -3,19 +3,20 @@ import axios from "axios";
 import { Menu } from "@headlessui/react";
 import { Link, navigate } from "@reach/router";
 import { logout } from './Auth'
+import { Category } from "../interfaces";
 
 const NavBar: FC = () => {
-	const [collections, setCollections] = useState([]);
+	const [categories, setCategories] = useState<Category[]>([]);
 	const [search, setSearch] = useState("");
 
 	useEffect(() => {
 		axios
-			.get("http://localhost:5000/api/product/collections")
+			.get("http://localhost:5000/api/v2/categories")
 			.then((res) => {
 				return res.data;
 			})
 			.then((data) => {
-				setCollections(data);
+				setCategories(data);
 			})
 			.catch((err) => {
 				console.error(err);
@@ -23,7 +24,7 @@ const NavBar: FC = () => {
 	}, []);
 
 	const handleSearch = () => {
-		navigate(`/?name=${search}`);
+		navigate(`?name=${search}`);
 	};
 
 	const handleEnter = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -107,10 +108,10 @@ const NavBar: FC = () => {
 							tabIndex={0}
 							className="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52"
 						>
-							{collections.map((c, i) => {
+							{categories.map((c, i) => {
 								return (
 									<li key={i}>
-										<Link to={`/${c}`}>{c}</Link>
+										<Link to={`/${c.id}`}>{c.name}</Link>
 									</li>
 								);
 							})}

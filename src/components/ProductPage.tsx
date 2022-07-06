@@ -1,11 +1,11 @@
-import axios, { AxiosResponse } from 'axios'
+import axios, { Axios, AxiosResponse } from 'axios'
 import React, {useState, useEffect, FC, ChangeEvent} from 'react'
 import { RouteComponentProps, useParams } from '@reach/router'
 import Layout from './Layout'
 import ProductsGrid from './ProductsGrid'
 import { validateToken } from './Auth'
 import { navigate } from '@reach/router'
-import { Category, ProductInfo, ProductVariation, Size } from '../interfaces'
+import { Category, ProductInfo, ProductV2, ProductVariation, Size } from '../interfaces'
 import { isTemplateExpression } from 'typescript'
 import PopupMessage from './PopupMessage'
 
@@ -190,13 +190,20 @@ const ProductPage: FC<RouteComponentProps> = () => {
         setProduct({ ...product, variations: variations});
     }
 
-    const handleSaveVariationChanges = () => {
+    const handleSaveChanges = () => {
         if (product === undefined) {
             return;
         }
 
         axios.put(`http://localhost:5000/api/v2/products/variations`, product.variations)
-            .then((res: AxiosResponse) => alert(`${res.status} : ${res.statusText}`))
+            .then((res: AxiosResponse) => alert("Product Updated Successfully"))
+            .catch(err => console.error(err));
+
+        var data: ProductV2[] = [];
+        data.push(product);
+
+        axios.put(`http://localhost:5000/api/v2/products`, data)
+            .then((res: AxiosResponse) => alert("Variations Updated Successfully"))
             .catch(err => console.error(err));
     }
 
@@ -258,10 +265,11 @@ const ProductPage: FC<RouteComponentProps> = () => {
                                 </div>
                             </div>
                         </div>
+                        <hr/>
                         {/* VARIATIONS */}
                         <div className='flex flex-row p-4'>
                             <button className="btn btn-error btn-md mr-4" onClick={handleDeleteVariations}>Delete Variation(s)</button>
-                            <button className="btn btn-success btn-md mr-4" onClick={handleSaveVariationChanges}>Save Changes</button>
+                            <button className="btn btn-success btn-md mr-4" onClick={handleSaveChanges}>Save Changes</button>
                         </div>
                         <div className='overflow-x-auto w-full p-4'>
                             <table className='table w-full'>
@@ -287,7 +295,7 @@ const ProductPage: FC<RouteComponentProps> = () => {
                                                         <input id={variation.id} type="checkbox" className="checkbox"  checked={checkedVariations[variation.id]} onChange={handleCheckVariation}/>
                                                     </label>
                                                 </th>
-                                                <td>$<input data-variation-id={variation.id} data-variation-property='price' type="number" step="0.1" placeholder="0.00" className="input input-ghost w-full" value={variation.price} onChange={handleVariationChanges}/></td>
+                                                <td>$<input data-variation-id={variation.id} data-variation-property='price' type="number" step="0.01" placeholder="0.00" className="input input-ghost w-full" value={variation.price} onChange={handleVariationChanges} /></td>
                                                 <td><input data-variation-id={variation.id} data-variation-property='quantity' type="number" step="1" placeholder="0" className="input input-ghost w-full" value={variation.quantity} onChange={handleVariationChanges}/></td>
                                                 <td><input data-variation-id={variation.id} data-variation-property='discountId' type="text" placeholder="0" className="input input-ghost w-full" value={variation.discountId || "None"} onChange={handleVariationChanges}/></td>
                                                 <td>

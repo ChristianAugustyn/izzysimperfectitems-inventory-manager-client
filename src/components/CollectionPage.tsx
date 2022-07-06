@@ -8,15 +8,15 @@ import { navigate } from '@reach/router'
 
 const CollectionPage: FC<RouteComponentProps> = () => {
     const params = useParams()
-    const { collection } = params
+    const { category } = params
     const [products, setProducts] = useState([])
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/api/product/${collection}`)
+        axios.get(`http://localhost:5000/api/v2/products?CategoryId=${category}`)
         .then(res => res.data)
         .then(data => setProducts(data))
         .catch(err => console.error(err))
-    }, [collection])
+    }, [category])
 
     return (
         <Layout>
