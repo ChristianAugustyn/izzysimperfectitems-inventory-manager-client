@@ -86,7 +86,7 @@ const CreateProduct: FC = () => {
 
         const formData = new FormData()
         formData.append("image", file, file.name)
-        formData.append("collection", mapTypeToCollection(form.type))
+        formData.append("category", mapTypeToCollection(form.type))
         //create new image
         const imgConfig: AxiosRequestConfig = {
             method: 'post',

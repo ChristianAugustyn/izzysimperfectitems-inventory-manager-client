@@ -73,3 +73,10 @@ export interface ProductInfo extends ProductV2 {
     variations: ProductVariation[],
     images: ProductImage[]
 }
+
+export interface S3Object {
+    eTag: string,
+    bucketName: string,
+    key: string,
+    lastModified: string
+}

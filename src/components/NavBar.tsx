@@ -24,7 +24,7 @@ const NavBar: FC = () => {
 	}, []);
 
 	const handleSearch = () => {
-		navigate(`?name=${search}`);
+		navigate(`/?name=${search}`);
 	};
 
 	const handleEnter = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -85,6 +85,11 @@ const NavBar: FC = () => {
 								</svg>
 							</button>
 						</div>
+					</div>
+					<div className='btn btn-ghost rounded-btn' onClick={() => navigate('/images')}>
+						<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="white">
+							<path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+						</svg>
 					</div>
 					<div className="dropdown dropdown-end">
 						<div tabIndex={0} className="btn btn-ghost rounded-btn">

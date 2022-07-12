@@ -8,6 +8,7 @@ import Login from './components/Login'
 import CreateProduct from './components/CreateProduct'
 import { Router , Redirect } from "@reach/router"
 import ProductPage from './components/ProductPage';
+import ImagesPage from './components/ImagesPage';
 
 
 
@@ -17,6 +18,7 @@ const routes = (
       <PrivateRoute path='/products/:productId' component={ProductPage} />
       <PrivateRoute path="/:category" component={CollectionPage}/>
       <PrivateRoute path='/create' component={CreateProduct}/>
+      <PrivateRoute path='/images' component={ImagesPage}/>
       <Login path='/login'/>
     </Router>
 )
