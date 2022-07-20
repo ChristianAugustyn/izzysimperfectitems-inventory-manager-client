@@ -1,5 +1,5 @@
 import axios, { Axios, AxiosResponse } from 'axios'
-import React, {useState, useEffect, FC, ChangeEvent} from 'react'
+import React, { useState, useEffect, FC, ChangeEvent } from 'react'
 import { RouteComponentProps, useParams } from '@reach/router'
 import Layout from './Layout'
 import ProductsGrid from './ProductsGrid'
@@ -8,6 +8,8 @@ import { navigate } from '@reach/router'
 import { Category, ProductInfo, ProductV2, ProductVariation, Size } from '../interfaces'
 import { isTemplateExpression } from 'typescript'
 import PopupMessage from './PopupMessage'
+import ImagePicker from './ImagePicker'
+import { DragDropContext, Droppable, Draggable, DropResult, DraggableProvided, DraggableStateSnapshot, DroppableProvided, DroppableStateSnapshot, DraggingStyle, NotDraggingStyle } from 'react-beautiful-dnd';
 
 const ProductPage: FC<RouteComponentProps> = () => {
     const params = useParams();
@@ -17,20 +19,20 @@ const ProductPage: FC<RouteComponentProps> = () => {
     const [categories, setCategories] = useState<Category[]>([]);
     const [sizes, setSizes] = useState<Size[]>([]);
     const [checkAll, setCheckAll] = useState<boolean>(false);
-    const [checkedVariations, setCheckedVariations] = useState<{[key: string]: boolean}>({});
+    const [checkedVariations, setCheckedVariations] = useState<{ [key: string]: boolean }>({});
     const [newVariation, setNewVariation] = useState<ProductVariation>({} as ProductVariation);
 
     useEffect(() => {
         axios.get(`http://localhost:5000/api/v2/categories`)
             .then((res: AxiosResponse) => res.data)
             .then((data: Category[]) => setCategories(data))
-            .catch(err => console.error(err)); 
+            .catch(err => console.error(err));
 
         axios.get(`http://localhost:5000/api/v2/products/${productId}`)
             .then((res: AxiosResponse) => res.data)
             .then((data: ProductInfo) => {
                 setProduct(data);
-                setCheckedVariations(Object.assign({}, ...data.variations.map(v => ({[v.id]: false}))));
+                setCheckedVariations(Object.assign({}, ...data.variations.map(v => ({ [v.id]: false }))));
             })
             .catch(err => {
                 setProduct(undefined);
@@ -44,10 +46,6 @@ const ProductPage: FC<RouteComponentProps> = () => {
             })
     }, []);
 
-    useEffect(() => {
-        console.log(product?.variations)
-    }, [product?.variations])
-
     // EVENT HANDLERS
     const handleProductInfoChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { id, value } = event.target;
@@ -55,12 +53,12 @@ const ProductPage: FC<RouteComponentProps> = () => {
             return;
         }
 
-        setProduct({...product, [id]: value});
+        setProduct({ ...product, [id]: value });
     }
 
     const handleCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
         const { value } = event.target;
-        
+
         if (product === undefined || value === undefined) {
             return;
         }
@@ -75,14 +73,14 @@ const ProductPage: FC<RouteComponentProps> = () => {
         if (product === undefined) {
             return;
         }
-        setProduct({...product, active: !product.active});
+        setProduct({ ...product, active: !product.active });
     }
 
     const handleVariationSizeSelect = (event: ChangeEvent<HTMLSelectElement>) => {
         var { id, value } = event.target;
         console.log(id, value)
         //TODO: add size change
-        if (product === undefined || value === undefined) {return;}
+        if (product === undefined || value === undefined) { return; }
 
         for (const variation of product.variations) {
             if (variation.id === id) {
@@ -92,13 +90,13 @@ const ProductPage: FC<RouteComponentProps> = () => {
             }
         }
 
-        setProduct({...product});
+        setProduct({ ...product });
     }
 
     const handleCheckAll = () => {
         setCheckAll(!checkAll);
         Object.keys(checkedVariations).forEach(id => checkedVariations[id] = !checkAll)
-        setCheckedVariations({...checkedVariations});
+        setCheckedVariations({ ...checkedVariations });
     }
 
     const handleCheckVariation = (event: ChangeEvent<HTMLInputElement>) => {
@@ -155,9 +153,9 @@ const ProductPage: FC<RouteComponentProps> = () => {
             return;
         }
 
-       axios.delete(`http://localhost:5000/api/v2/products/${product.id}/variations?${queryString}`)
-        .then((res: AxiosResponse) => window.location.reload())
-        .catch(err => console.error(err));
+        axios.delete(`http://localhost:5000/api/v2/products/${product.id}/variations?${queryString}`)
+            .then((res: AxiosResponse) => window.location.reload())
+            .catch(err => console.error(err));
     }
 
     const handleVariationChanges = (event: ChangeEvent<HTMLInputElement>) => {
@@ -165,7 +163,7 @@ const ProductPage: FC<RouteComponentProps> = () => {
         const property = event.target.getAttribute("data-variation-property");
         const variationId = event.target.getAttribute('data-variation-id');
 
-        if  (product === undefined || property === null) {
+        if (product === undefined || property === null) {
             return;
         }
 
@@ -187,7 +185,7 @@ const ProductPage: FC<RouteComponentProps> = () => {
         var variations = product.variations.filter(v => v.id !== variation.id);
         variations.push(variation);
 
-        setProduct({ ...product, variations: variations});
+        setProduct({ ...product, variations: variations });
     }
 
     const handleSaveChanges = () => {
@@ -207,11 +205,64 @@ const ProductPage: FC<RouteComponentProps> = () => {
             .catch(err => console.error(err));
     }
 
+    //DRAG AND DROP
+    const reorder = (list: any[], startIndex: number, endIndex: number, middleware: Function): any[] => {
+        let result = list;
+        console.log(result);
+        const [removed] = result.splice(startIndex, 1);
+        console.log(removed);
+        result.splice(endIndex, 0, removed);
+        console.log(result);
 
+        result = middleware(result);
+
+        return result;
+    }
+
+    const onDragEnd = (result: DropResult) => {
+        if (!result.destination) {
+            return;
+        }
+
+        if (product === undefined) {
+            return;
+        }
+
+        const items = reorder(product.variations, result.source.index, result.destination.index, (list: ProductVariation[]): ProductVariation[] => {
+            list.forEach((item, i) => {
+                item.displayOrder = i;
+            });
+
+            return list;
+        });
+
+        setProduct({
+            ...product,
+            variations: items
+        });
+    }
 
     return (
         <Layout>
-            { !!product ?
+            <input type="checkbox" id="editImages" className="modal-toggle" />
+            <div className="modal modal-bottom sm:modal-middle">
+                <div className="modal-box">
+                    <label htmlFor="editImages" className="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+                    <h3 className="font-bold text-lg">Link Images</h3>
+
+                    {/* <ImagePicker/> */}
+
+                    <div className='flex flex-row space-x-4'>
+                        <div className="modal-action">
+                            <label htmlFor="editImages" className="btn btn-sm btn-error">CLOSE</label>
+                        </div>
+                        <div className="modal-action">
+                            <label htmlFor="editImages" className="btn btn-sm btn-success">SAVE</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {!!product ?
                 (<div className='container mx-auto flex'>
                     {/* images */}
                     <div className='w-1/3 p-4'>
@@ -220,33 +271,35 @@ const ProductPage: FC<RouteComponentProps> = () => {
                                 product.images.map((image, i) => (
                                     <div id={image.id} className="carousel-item w-full">
                                         <img src={image.imgUrl} className="w-full" />
-                                    </div> 
+                                    </div>
                                 ))
                             }
-                        </div> 
+                        </div>
                         <div className="flex justify-center w-full py-2 gap-2">
                             {
-                                product.images.map((image, i) => (<a href={`#${image.id}`} className="btn btn-xs">{i+1}</a> ))
+                                product.images.map((image, i) => (<a href={`#${image.id}`} className="btn btn-xs">{i + 1}</a>))
                             }
                         </div>
+                        <label htmlFor="editImages" className='btn btn-sm btn-secondary'>EDIT IMAGES</label>
                     </div>
+
                     <div className='w-2/3 p-4'>
                         {/* Product Info Row 1 */}
                         <div className='flex flex-row'>
                             <div className='form-control w-1/2 p-4'>
                                 <label className='label'><span className='label-text'>Product Id</span></label>
-                                <input type="text" placeholder="Id" className="input input-bordered w-full " value={product.id} disabled/>
+                                <input type="text" placeholder="Id" className="input input-bordered w-full " value={product.id} disabled />
                             </div>
                             <div className='form-control w-1/2 p-4'>
                                 <label className='label'><span className='label-text'>Name</span></label>
-                                <input id='name' type="text" placeholder="Id" className="input input-bordered w-full " value={product.name} onChange={handleProductInfoChange}/>
+                                <input id='name' type="text" placeholder="Id" className="input input-bordered w-full " value={product.name} onChange={handleProductInfoChange} />
                             </div>
                         </div>
                         {/* Product Info Row 2 */}
                         <div className='flex flex-row'>
                             <div className='form-control w-1/2 p-4 '>
                                 <label className='label'><span className='label-text'>Description</span></label>
-                                <textarea id='description' className="textarea input input-bordered w-full " value={product.description} onChange={handleProductInfoChange}/>
+                                <textarea id='description' className="textarea input input-bordered w-full " value={product.description} onChange={handleProductInfoChange} />
                             </div>
                             <div className='flex flex-row'>
                                 <div className='form-control p-4'>
@@ -261,23 +314,48 @@ const ProductPage: FC<RouteComponentProps> = () => {
                                 </div>
                                 <div className='form-control p-4'>
                                     <label className='label'><span className='label-text'>Active?</span></label>
-                                    <input id='active' type="checkbox" className="toggle toggle-accent toggle-lg " checked={product.active} onChange={handleProductActive}/>
+                                    <input id='active' type="checkbox" className="toggle toggle-accent toggle-lg " checked={product.active} onChange={handleProductActive} />
                                 </div>
                             </div>
                         </div>
-                        <hr/>
+                        <hr />
                         {/* VARIATIONS */}
                         <div className='flex flex-row p-4'>
                             <button className="btn btn-error btn-md mr-4" onClick={handleDeleteVariations}>Delete Variation(s)</button>
                             <button className="btn btn-success btn-md mr-4" onClick={handleSaveChanges}>Save Changes</button>
                         </div>
-                        <div className='overflow-x-auto w-full p-4'>
+                        <div className='overflow-x-auto w-full p-4 h-full'>
+                            <table className='table w-full h-100'>
+                                <tr className='border-t-2'>
+                                    <th>
+                                        <button className="btn btn-info btn-circle btn-outline btn-sm" onClick={handleNewVariation}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </button>
+                                    </th>
+                                    <td>$<input id="price" type="number" placeholder="0.00" step='0.01' className="input input-ghost w-full" value={newVariation.price} onChange={handleNewVariationChange} /></td>
+                                    <td><input id="quantity" type="number" placeholder="0" step='1' className="input input-ghost w-full" value={newVariation.quantity} onChange={handleNewVariationChange} /></td>
+                                    <td><input id="discountId" type="text" placeholder="None" className="input input-ghost w-full" value={newVariation.discountId || 'None'} onChange={handleNewVariationChange} /></td>
+                                    <td>
+                                        <select id="sizeId" className="select select-ghost w-full" onChange={handleNewVariationChange}>
+                                            <option selected>None</option>
+                                            {
+                                                sizes.map(s => (
+
+                                                    <option key={s.id} value={s.id}>{s.sizeValue}</option>
+                                                ))
+                                            }
+                                        </select>
+                                    </td>
+                                </tr>
+                            </table>
                             <table className='table w-full'>
                                 <thead>
                                     <tr>
-                                        <th>          
+                                        <th>
                                             <label>
-                                                <input id='checkAll' type="checkbox" className="checkbox" checked={checkAll} onChange={handleCheckAll}/>
+                                                <input id='checkAll' type="checkbox" className="checkbox" checked={checkAll} onChange={handleCheckAll} />
                                             </label>
                                         </th>
                                         <th>Price</th>
@@ -286,56 +364,47 @@ const ProductPage: FC<RouteComponentProps> = () => {
                                         <th>Size</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    {
-                                        product.variations.sort((a, b) => a.displayOrder - b.displayOrder).map((variation, i) => (
-                                            <tr key={variation.id}>
-                                                <th>
-                                                    <label>
-                                                        <input id={variation.id} type="checkbox" className="checkbox"  checked={checkedVariations[variation.id]} onChange={handleCheckVariation}/>
-                                                    </label>
-                                                </th>
-                                                <td>$<input data-variation-id={variation.id} data-variation-property='price' type="number" step="0.01" placeholder="0.00" className="input input-ghost w-full" value={variation.price} onChange={handleVariationChanges} /></td>
-                                                <td><input data-variation-id={variation.id} data-variation-property='quantity' type="number" step="1" placeholder="0" className="input input-ghost w-full" value={variation.quantity} onChange={handleVariationChanges}/></td>
-                                                <td><input data-variation-id={variation.id} data-variation-property='discountId' type="text" placeholder="0" className="input input-ghost w-full" value={variation.discountId || "None"} onChange={handleVariationChanges}/></td>
-                                                <td>
-                                                    <select id={variation.id} className="select select-ghost w-full" onChange={handleVariationSizeSelect}>
-                                                        <option>None</option>
-                                                        {
-                                                            sizes.map(s => (
-                                                                <option key={s.id} selected={s.id === variation.sizeId} value={s.id}>{s.sizeValue}</option>
-                                                            ))
-                                                        }
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    }
-                                     {/* ADD NEW VARIATION SECTION */}
-                                    <tr className='border-t-2'>
-                                        <th>
-                                            <button className="btn btn-info btn-circle btn-outline btn-sm" onClick={handleNewVariation}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                            </button>
-                                        </th>
-                                        <td>$<input id="price" type="number" placeholder="0.00" step='0.01' className="input input-ghost w-full" value={newVariation.price} onChange={handleNewVariationChange}/></td>
-                                        <td><input id="quantity" type="number" placeholder="0" step='1' className="input input-ghost w-full" value={newVariation.quantity} onChange={handleNewVariationChange}/></td>
-                                        <td><input id="discountId" type="text" placeholder="None" className="input input-ghost w-full" value={newVariation.discountId || 'None'} onChange={handleNewVariationChange}/></td>
-                                        <td>
-                                            <select id="sizeId" className="select select-ghost w-full" onChange={handleNewVariationChange}>
-                                                <option selected>None</option>
+                                <DragDropContext onDragEnd={onDragEnd}>
+                                    <Droppable droppableId="droppable" isDropDisabled={false}>
+                                        {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
+                                            <tbody ref={provided.innerRef}>
                                                 {
-                                                    sizes.map(s => (
-                                                        
-                                                        <option key={s.id} value={s.id}>{s.sizeValue}</option>
+                                                    product.variations.sort((a, b) => a.displayOrder - b.displayOrder).map((variation, i) => (
+                                                        <Draggable key={variation.id} draggableId={variation.id} index={i}>
+                                                            {(dragableProvided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
+                                                                <tr
+                                                                    ref={dragableProvided.innerRef}
+                                                                    {...dragableProvided.draggableProps}
+                                                                    {...dragableProvided.dragHandleProps}
+                                                                >
+                                                                    <th>
+                                                                        <label>
+                                                                            <input id={variation.id} type="checkbox" className="checkbox" checked={checkedVariations[variation.id]} onChange={handleCheckVariation} />
+                                                                        </label>
+                                                                    </th>
+                                                                    <td>$<input data-variation-id={variation.id} data-variation-property='price' type="number" step="0.01" placeholder="0.00" className="input input-ghost w-full" value={variation.price} onChange={handleVariationChanges} /></td>
+                                                                    <td><input data-variation-id={variation.id} data-variation-property='quantity' type="number" step="1" placeholder="0" className="input input-ghost w-full" value={variation.quantity} onChange={handleVariationChanges} /></td>
+                                                                    <td><input data-variation-id={variation.id} data-variation-property='discountId' type="text" placeholder="0" className="input input-ghost w-full" value={variation.discountId || "None"} onChange={handleVariationChanges} /></td>
+                                                                    <td>
+                                                                        <select id={variation.id} className="select select-ghost w-full" onChange={handleVariationSizeSelect}>
+                                                                            <option>None</option>
+                                                                            {
+                                                                                sizes.map(s => (
+                                                                                    <option key={s.id} selected={s.id === variation.sizeId} value={s.id}>{s.sizeValue}</option>
+                                                                                ))
+                                                                            }
+                                                                        </select>
+                                                                    </td>
+                                                                </tr>
+                                                            )}
+                                                        </Draggable>
                                                     ))
                                                 }
-                                            </select>
-                                        </td>
-                                    </tr>
-                                </tbody>
+                                                {/* ADD NEW VARIATION SECTION */}
+                                            </tbody>
+                                        )}
+                                    </Droppable>
+                                </DragDropContext>
                             </table>
                         </div>
                     </div>

@@ -7,7 +7,6 @@ import Layout from './Layout';
 const ImagesPage: FC<RouteComponentProps> = () => {
 
     const hiddenInput = useRef<HTMLInputElement>(null)
-    const [newImage, setNewImage] = useState<ProductImage>();
     const [images, setImages] = useState<ProductImage[]>([]);
     const [awsImages, setAwsImages] = useState<S3Object[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -120,7 +119,7 @@ const ImagesPage: FC<RouteComponentProps> = () => {
                 </div>
             </div>
 
-            <div className='container mx-auto flex flex-wrap relative w-full h-full'>
+            <div className='container mx-auto flex flex-wrap relative w-full h-full p-4'>
             <div className='flex flex-row space-x-4 py-4'>
                 <label htmlFor="addNewImageModal" className='btn btn-sm btn-info'>ADD IMAGE</label>
                 <button className='btn btn-sm btn-error'>DELETE IMAGE(S)</button>
