@@ -61,7 +61,7 @@ export interface ProductVariation {
 
 export interface ProductImage {
     id: string,
-    productId: string,
+    productId: string | null,
     imgUrl: string,
     displayOrder: number,
     createdAt: string,

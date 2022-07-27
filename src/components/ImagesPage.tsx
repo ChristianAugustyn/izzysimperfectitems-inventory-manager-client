@@ -152,7 +152,7 @@ const ImagesPage: FC<RouteComponentProps> = () => {
                                         <tr>
                                             <th>
                                                 <label>
-                                                    <input key={image.id} type="checkbox" className="checkbox" />
+                                                    <input key={image.id} type="checkbox" className="checkbox"/>
                                                 </label>
                                             </th>
                                             <td>

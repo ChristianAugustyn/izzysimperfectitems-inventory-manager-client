@@ -5,11 +5,12 @@ import Layout from './Layout'
 import ProductsGrid from './ProductsGrid'
 import { validateToken } from './Auth'
 import { navigate } from '@reach/router'
-import { Category, ProductInfo, ProductV2, ProductVariation, Size } from '../interfaces'
+import { Category, ProductImage, ProductInfo, ProductV2, ProductVariation, Size } from '../interfaces'
 import { isTemplateExpression } from 'typescript'
 import PopupMessage from './PopupMessage'
-import ImagePicker from './ImagePicker'
+import ImagePicker, { CheckedImages } from './ImagePicker'
 import { DragDropContext, Droppable, Draggable, DropResult, DraggableProvided, DraggableStateSnapshot, DroppableProvided, DroppableStateSnapshot, DraggingStyle, NotDraggingStyle } from 'react-beautiful-dnd';
+import { stringify } from 'querystring'
 
 const ProductPage: FC<RouteComponentProps> = () => {
     const params = useParams();
@@ -193,6 +194,7 @@ const ProductPage: FC<RouteComponentProps> = () => {
             return;
         }
 
+        //TODO: add toast component when a success or error occurs
         axios.put(`http://localhost:5000/api/v2/products/variations`, product.variations)
             .then((res: AxiosResponse) => alert("Product Updated Successfully"))
             .catch(err => console.error(err));
@@ -242,22 +244,81 @@ const ProductPage: FC<RouteComponentProps> = () => {
         });
     }
 
+    const handleEditImages = (imageDict: CheckedImages, images: ProductImage[]): boolean => {
+        var flag = true;
+
+        if (product === undefined) {
+            return false;
+        }
+
+        var imagesToUpdate: ProductImage[] = [];
+
+        //add all images that were set to true to "imagesToUpdate"
+        Object.entries(imageDict).forEach(([id, checked]: [id: string, checked: boolean]) => {
+            if (checked) {
+                let image = images.find(i => i.id === id);
+                if (image !== undefined && (image.productId === product.id || image.productId === null)) {
+                    image.productId = product.id;
+                    imagesToUpdate.push(image);
+                }
+                else {
+                    alert("Error: cannot link an image to a product that that is already linked");
+                    flag = false;
+                }
+            }
+            else { //check if any of the images associated wiht the product were set to false and remove the productId refference
+                let image = product.images.find(i => i.id === id);
+
+                if (image !== undefined) {
+                    image.productId = null;
+                    imagesToUpdate.push(image);
+                }
+            }
+        });
+
+        setProduct({
+            ...product,
+            images: imagesToUpdate
+        });
+
+        return flag;
+    }
+
+    const handleSaveImages = () => {
+        if (product === undefined) {
+            return;
+        }
+
+        axios.put(`http://localhost:5000/api/v2/images`, product.images)
+            .then((res: AxiosResponse) => window.location.reload())
+            .catch(err => { 
+                alert("Error: Images did not save"); 
+                window.location.reload(); 
+            });
+    } 
+
     return (
         <Layout>
             <input type="checkbox" id="editImages" className="modal-toggle" />
             <div className="modal modal-bottom sm:modal-middle">
-                <div className="modal-box">
+                <div className="modal-box p-4">
                     <label htmlFor="editImages" className="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
                     <h3 className="font-bold text-lg">Link Images</h3>
+                    {!!product ?
+                        (
+                            <ImagePicker checkedImages={product.images} onChange={handleEditImages} />
+                        )
+                        :
+                        ''
+                    }
 
-                    {/* <ImagePicker/> */}
 
                     <div className='flex flex-row space-x-4'>
                         <div className="modal-action">
                             <label htmlFor="editImages" className="btn btn-sm btn-error">CLOSE</label>
                         </div>
                         <div className="modal-action">
-                            <label htmlFor="editImages" className="btn btn-sm btn-success">SAVE</label>
+                            <label htmlFor="editImages" className="btn btn-sm btn-success" onClick={handleSaveImages}>SAVE</label>
                         </div>
                     </div>
                 </div>
@@ -266,18 +327,18 @@ const ProductPage: FC<RouteComponentProps> = () => {
                 (<div className='container mx-auto flex'>
                     {/* images */}
                     <div className='w-1/3 p-4'>
-                        <div className="carousel w-full">
+                        <div className="carousel w-full carousel-center max-w-md p-4 space-x-4 rounded-box">
                             {
                                 product.images.map((image, i) => (
-                                    <div id={image.id} className="carousel-item w-full">
-                                        <img src={image.imgUrl} className="w-full" />
+                                    <div id={`image-${ i + 1}`} className="carousel-item w-full">
+                                        <img src={image.imgUrl} className="w-full" alt={image.imgUrl}/>
                                     </div>
                                 ))
                             }
                         </div>
                         <div className="flex justify-center w-full py-2 gap-2">
                             {
-                                product.images.map((image, i) => (<a href={`#${image.id}`} className="btn btn-xs">{i + 1}</a>))
+                                product.images.map((image, i) => (<a href={`#image-${i + 1}`} className="btn btn-xs">{i + 1}</a>))
                             }
                         </div>
                         <label htmlFor="editImages" className='btn btn-sm btn-secondary'>EDIT IMAGES</label>
@@ -324,6 +385,7 @@ const ProductPage: FC<RouteComponentProps> = () => {
                             <button className="btn btn-error btn-md mr-4" onClick={handleDeleteVariations}>Delete Variation(s)</button>
                             <button className="btn btn-success btn-md mr-4" onClick={handleSaveChanges}>Save Changes</button>
                         </div>
+                        <h1 className='px-4 py-2 font-semibold text-xl'>Variations</h1>
                         <div className='overflow-x-auto w-full p-4 h-full'>
                             <table className='table w-full h-100'>
                                 <tr className='border-t-2'>
