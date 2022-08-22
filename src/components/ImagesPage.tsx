@@ -1,8 +1,10 @@
 import { Link, RouteComponentProps } from '@reach/router';
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import React, { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
 import { Category, ProductImage, S3Object } from '../interfaces';
+import { CheckedImages } from './ImagePicker';
 import Layout from './Layout';
+import FileDragAndDrop from './util/FilesDragAndDrop';
 
 const ImagesPage: FC<RouteComponentProps> = () => {
 
@@ -12,13 +14,21 @@ const ImagesPage: FC<RouteComponentProps> = () => {
     const [categories, setCategories] = useState<Category[]>([]);
     const [category, setCategory] = useState<string>('');
     const [file, setFile] = useState<File>();
+    const [checked, setChecked] = useState<CheckedImages>({});
     
     const AWS_S3_URL_V1 = process.env.REACT_APP_AWS_S3_URL_V1;
     const AWS_S3_URL_V2 = process.env.REACT_APP_AWS_S3_URL_V2;
 
     useEffect(() => {
         axios.get(`http://localhost:5000/api/v2/images`)
-        .then((res: AxiosResponse) => setImages(res.data))
+        .then((res: AxiosResponse) => {
+            let images: ProductImage[] = res.data;
+            setImages(images)
+            images.forEach((img, i) => {
+                checked[img.id] = false;
+            })
+            setChecked({...checked});
+        })
         .catch(err => console.error(err));
 
         axios.get(`http://localhost:5000/api/bucket/objects`)
@@ -37,10 +47,19 @@ const ImagesPage: FC<RouteComponentProps> = () => {
 			});
     }, []);
 
+    const handleImageChecked = (event: ChangeEvent<HTMLInputElement>) => {
+        const { id } = event.target;
+        const updatedChecked = {
+            ...checked,
+            [id]: !checked[id]
+        }
+        setChecked(updatedChecked);
+    }
+
     const handleFileClick = () => {
 		//when the user clicks the change image button, it clicks hidden input
 		if (hiddenInput.current !== null){
-			hiddenInput.current.click()
+			hiddenInput.current.click();
 		}
 	}
 
@@ -56,7 +75,6 @@ const ImagesPage: FC<RouteComponentProps> = () => {
 
     const handleCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
         const { value } = event.target;
-
         setCategory(value);
     }
 
@@ -66,6 +84,7 @@ const ImagesPage: FC<RouteComponentProps> = () => {
             return
         }
 
+        console.log(category);
         if (category == null || category === '') {
             return;
         }
@@ -91,22 +110,77 @@ const ImagesPage: FC<RouteComponentProps> = () => {
         }
     }
 
+    const handleDeleteImages = async () => {
+        //construct queryparams
+        // eslint-disable-next-line no-restricted-globals
+        let isExecute = confirm("Are you sure You want to delete these images?");
+
+        if (!isExecute) {
+            return;
+        }
+
+        let imageKeys = "";
+        Object.entries(checked).every(([imageId, checked]: [string, boolean]) => {
+            if (checked === false) {
+                return true;
+            }
+
+            let imageObject = images.find((image: ProductImage) => image.id === imageId);
+
+            if (imageObject!.productId !== null) {
+                alert("one of the images selected is linked to a product, please make sure all images are unlinked");
+                return false;
+            }
+
+            if (imageObject === undefined) {
+                alert(`image of id: ${imageId} could not be found`);
+                return false;
+            }
+
+            let s3Object = awsImages.find((i: S3Object) => {
+                let key = i.key.replace(' ', '+');
+                return `${AWS_S3_URL_V1}/${key}` === imageObject!.imgUrl || `${AWS_S3_URL_V2}/${key}` === imageObject!.imgUrl;
+            });
+
+            imageKeys += `key=${s3Object?.key}|${imageId}`;
+
+        })
+
+        if (imageKeys === "") {
+            return;
+        }
+
+        console.log(imageKeys);
+
+        axios.delete(`http://localhost:5000/api/v2/images?${imageKeys}`)
+            .then((res: AxiosResponse) => window.location.reload())
+            .catch((err: AxiosError) => alert(err.message));
+        
+    }
+
     return (
         <Layout>
             <input type="checkbox" id="addNewImageModal" className="modal-toggle" />
             <div className="modal">
                 <div className="modal-box relative">
                     <label htmlFor="addNewImageModal" className="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
-                    <div className='flex flex-row w-full'>
-                        <input type='file' className="hidden" ref={hiddenInput} onChange={handleFileChange}/>
+                    <div className='flex flex-col w-full'>
+                        {/* <input type='file' className="hidden" ref={hiddenInput} onChange={handleFileChange}/>
                         <button className="btn btn-sm" onClick={handleFileClick}>
                             Image
-                        </button>
+                        </button> */}
+                        <FileDragAndDrop message='Drag and drop product image' icon={
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>} 
+                            onFileChange={setFile}
+                        />
                         <p className='mx-3 truncate w-full'>{!!file ? file.name : ''}</p>
                     </div>
                     <div className='form-control'>
                         <label className='label'><span className='label-text'>Category</span></label>
                         <select id='category' className="select select-bordered w-full" onChange={handleCategoryChange}>
+                            <option id="" value=""></option>
                             {
                                 categories.map(c => {
                                     return <option id={c.name} value={c.name}>{c.name}</option>
@@ -122,7 +196,7 @@ const ImagesPage: FC<RouteComponentProps> = () => {
             <div className='container mx-auto flex flex-wrap relative w-full h-full p-4'>
             <div className='flex flex-row space-x-4 py-4'>
                 <label htmlFor="addNewImageModal" className='btn btn-sm btn-info'>ADD IMAGE</label>
-                <button className='btn btn-sm btn-error'>DELETE IMAGE(S)</button>
+                <button className='btn btn-sm btn-error' onClick={handleDeleteImages}>DELETE IMAGE(S)</button>
             </div>
             {
                 images.length > 0 ?
@@ -152,7 +226,7 @@ const ImagesPage: FC<RouteComponentProps> = () => {
                                         <tr>
                                             <th>
                                                 <label>
-                                                    <input key={image.id} type="checkbox" className="checkbox"/>
+                                                    <input id={image.id} type="checkbox" className="checkbox" onChange={handleImageChecked}/>
                                                 </label>
                                             </th>
                                             <td>

@@ -41,8 +41,6 @@ const ImagePicker: FC<Props> = ({ checkedImages, onChange }) => {
             return;
         }
         setChecked(updatedChecked);
-        
-
     }
 
     return (

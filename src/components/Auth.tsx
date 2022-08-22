@@ -16,19 +16,19 @@ interface StoredData {
 }
 
 interface AuthResponse {
-    id: string,
     firstName: string,
     lastName: string,
+    username: string,
     token: string
 }
 
 const login = (credentials: Credentials): Promise<boolean> => {
     const { username, password } = credentials
-    return axios.post('http://localhost:5000/api/auth/login', credentials)
+    return axios.post('http://localhost:5000/api/v2/auth/login', credentials)
         .then(res => res.data as AuthResponse)
         .then(data => {
             const { token, firstName } = data
-
+            console.log(data);
             const storedData: StoredData = {token: token, name: firstName}
 
             localStorage.setItem(KEY, JSON.stringify(storedData))
