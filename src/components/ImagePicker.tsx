@@ -5,7 +5,7 @@ import { ProductImage } from '../interfaces';
 
 interface Props {
     checkedImages: ProductImage[],
-    onChange: Function
+    onChange: (imageDict: CheckedImages, images: ProductImage[]) => boolean
 }
 
 export interface CheckedImages {
@@ -59,7 +59,7 @@ const ImagePicker: FC<Props> = ({ checkedImages, onChange }) => {
                 </thead>
                 <tbody>
                     {
-                        images.map((img: ProductImage, i: number) => (
+                        images.length > 0 && images.map((img: ProductImage, i: number) => (
                             <tr>
                                 <th>
                                     <label>

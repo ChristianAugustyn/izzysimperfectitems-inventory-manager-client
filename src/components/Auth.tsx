@@ -56,20 +56,20 @@ const validateToken = () => {
     const sessionInfo: StoredData = JSON.parse(rawData)
 
     if (!sessionInfo.token){
-        // console.log("NO VALID TOKEN PRESENT")
+        console.log("NO VALID TOKEN PRESENT")
         return false
     }
 
-    return axios.get('http://localhost:5000/api/auth/validate', {
+    return axios.get('http://localhost:5000/api/v2/auth/validate', {
         headers: {
             'Authorization': `Bearer ${sessionInfo.token}`
         }
     }).then(res => {
-        // console.log("TOKEN VALID")
+        console.log("TOKEN VALID")
         return true
     })
     .catch(err => {
-    //     console.log('TOKEN INVALID')
+        console.log('TOKEN INVALID')
         return false
     })
 }

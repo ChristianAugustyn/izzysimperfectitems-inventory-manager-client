@@ -120,8 +120,8 @@ const NavBar: FC = () => {
 									</li>
 								);
 							})}
-							<div className="divider" />
-							<li>
+							{/* <div className="divider" /> */}
+							{/* <li>
 								<Link to="/create">
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +139,27 @@ const NavBar: FC = () => {
 									</svg>
 									New Product
 								</Link>
+							</li> */}
+						</ul>
+					</div>
+					<div className="dropdown dropdown-end">
+						<div tabIndex={0} className="btn btn-ghost rounded-btn">
+							<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth={2}>
+								<path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+							</svg>
+						</div>
+
+						<ul
+							tabIndex={0}
+							className="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52"
+						>
+							<li>
+								<Link to='/create/category'>Create Category</Link>
 							</li>
+							<li>
+								<Link to='/create/product'>Create Product</Link>
+							</li>
+
 						</ul>
 					</div>
 					<div className='btn btn-ghost' onClick={() => handleLogout()}>
