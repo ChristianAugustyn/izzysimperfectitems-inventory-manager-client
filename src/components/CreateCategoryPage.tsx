@@ -38,7 +38,7 @@ const CreateCategoryPage: FC<RouteComponentProps> = () => {
         try {
             let res: AxiosResponse = await axios.post(`http://localhost:5000/api/v2/categories`, newCategory);
             if (res.status === 200) {
-                alert('sucess');
+                alert('success');
                 window.location.reload();
             }
         } catch(err) {

@@ -1,5 +1,5 @@
 import axios, { Axios, AxiosResponse } from 'axios'
-import React, { useState, useEffect, FC, ChangeEvent } from 'react'
+import React, { useState, useEffect, FC, ChangeEvent, useRef } from 'react'
 import { RouteComponentProps, useParams } from '@reach/router'
 import Layout from './Layout'
 import ProductsGrid from './ProductsGrid'
@@ -13,6 +13,7 @@ import { DragDropContext, Droppable, Draggable, DropResult, DraggableProvided, D
 import { stringify } from 'querystring'
 
 const ProductPage: FC<RouteComponentProps> = () => {
+
     const params = useParams();
     const { productId } = params;
 
@@ -38,6 +39,7 @@ const ProductPage: FC<RouteComponentProps> = () => {
             .catch(err => {
                 setProduct(undefined);
                 console.error(err)
+                //TODO: navigate o 404 page;
             });
         axios.get(`http://localhost:5000/api/v2/sizes`)
             .then((res: AxiosResponse) => res.data)
@@ -46,6 +48,8 @@ const ProductPage: FC<RouteComponentProps> = () => {
                 console.log(err);
             })
     }, []);
+
+    console.log(product?.variations);
 
     // EVENT HANDLERS
     const handleProductInfoChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -295,7 +299,29 @@ const ProductPage: FC<RouteComponentProps> = () => {
                 alert("Error: Images did not save"); 
                 window.location.reload(); 
             });
-    } 
+    }
+
+    const deleteProduct = async () => {
+        let answer = window.prompt(`Are you sure you want to delete this product?\nto confirm, please type '${product?.name}'`);
+        
+        if (answer !== product?.name) {
+            alert('Incorrect');
+        }
+
+        try {
+            let res = await axios.delete(`http://localhost:5000/api/v2/products?id=${product?.id}`);
+
+            if (res.status !== 200) {
+                alert("Error: there was an issue removing the product, please try again");
+                return;
+            }
+
+            window.location.reload();
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
 
     return (
         <Layout>
@@ -324,152 +350,155 @@ const ProductPage: FC<RouteComponentProps> = () => {
                 </div>
             </div>
             {!!product ?
-                (<div className='container mx-auto flex'>
+                (<div className='container mx-auto flex flex-col'>
                     {/* images */}
-                    <div className='w-1/3 p-4'>
-                        <div className="carousel w-full carousel-center max-w-md p-4 space-x-4 rounded-box">
-                            {
-                                product.images.map((image, i) => (
-                                    <div id={`image-${ i + 1}`} className="carousel-item w-full">
-                                        <img src={image.imgUrl} className="w-full" alt={image.imgUrl}/>
-                                    </div>
-                                ))
-                            }
+                    <div className='flex w-full'>
+                        <div className='w-1/3 p-4'>
+                            <div className="carousel w-full carousel-center max-w-md p-4 space-x-4 rounded-box">
+                                {
+                                    product.images.map((image, i) => (
+                                        <div id={`image-${ i + 1}`} className="carousel-item w-full">
+                                            <img src={image.imgUrl} className="w-full" alt={image.imgUrl}/>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                            <div className="flex justify-center w-full py-2 gap-2">
+                                {
+                                    product.images.map((image, i) => (<a href={`#image-${i + 1}`} className="btn btn-xs">{i + 1}</a>))
+                                }
+                            </div>
+                            <label htmlFor="editImages" className='btn btn-sm btn-secondary'>EDIT IMAGES</label>
                         </div>
-                        <div className="flex justify-center w-full py-2 gap-2">
-                            {
-                                product.images.map((image, i) => (<a href={`#image-${i + 1}`} className="btn btn-xs">{i + 1}</a>))
-                            }
-                        </div>
-                        <label htmlFor="editImages" className='btn btn-sm btn-secondary'>EDIT IMAGES</label>
-                    </div>
 
-                    <div className='w-2/3 p-4'>
-                        {/* Product Info Row 1 */}
-                        <div className='flex flex-row'>
-                            <div className='form-control w-1/2 p-4'>
-                                <label className='label'><span className='label-text'>Product Id</span></label>
-                                <input type="text" placeholder="Id" className="input input-bordered w-full " value={product.id} disabled />
-                            </div>
-                            <div className='form-control w-1/2 p-4'>
-                                <label className='label'><span className='label-text'>Name</span></label>
-                                <input id='name' type="text" placeholder="Id" className="input input-bordered w-full " value={product.name} onChange={handleProductInfoChange} />
-                            </div>
-                        </div>
-                        {/* Product Info Row 2 */}
-                        <div className='flex flex-row'>
-                            <div className='form-control w-1/2 p-4 '>
-                                <label className='label'><span className='label-text'>Description</span></label>
-                                <textarea id='description' className="textarea input input-bordered w-full " value={product.description} onChange={handleProductInfoChange} />
-                            </div>
+                        <div className='w-2/3 p-4'>
+                            {/* Product Info Row 1 */}
                             <div className='flex flex-row'>
-                                <div className='form-control p-4'>
-                                    <label className='label'><span className='label-text'>Category</span></label>
-                                    <select id='category' className="select select-bordered w-full " onChange={handleCategoryChange}>
-                                        {
-                                            categories.map(c => {
-                                                return <option id={c.name} selected={c.id === product.categoryId} value={c.id}>{c.name}</option>
-                                            })
-                                        }
-                                    </select>
+                                <div className='form-control w-1/2 p-4'>
+                                    <label className='label'><span className='label-text'>Product Id</span></label>
+                                    <input type="text" placeholder="Id" className="input input-bordered w-full " value={product.id} disabled />
                                 </div>
-                                <div className='form-control p-4'>
-                                    <label className='label'><span className='label-text'>Active?</span></label>
-                                    <input id='active' type="checkbox" className="toggle toggle-accent toggle-lg " checked={product.active} onChange={handleProductActive} />
+                                <div className='form-control w-1/2 p-4'>
+                                    <label className='label'><span className='label-text'>Name</span></label>
+                                    <input id='name' type="text" placeholder="Id" className="input input-bordered w-full " value={product.name} onChange={handleProductInfoChange} />
                                 </div>
                             </div>
-                        </div>
-                        <hr />
-                        {/* VARIATIONS */}
-                        <div className='flex flex-row p-4'>
-                            <button className="btn btn-error btn-md mr-4" onClick={handleDeleteVariations}>Delete Variation(s)</button>
-                            <button className="btn btn-success btn-md mr-4" onClick={handleSaveChanges}>Save Changes</button>
-                        </div>
-                        <h1 className='px-4 py-2 font-semibold text-xl'>Variations</h1>
-                        <div className='overflow-x-auto w-full p-4 h-full'>
-                            <table className='table w-full h-100'>
-                                <tr className='border-t-2'>
-                                    <th>
-                                        <button className="btn btn-info btn-circle btn-outline btn-sm" onClick={handleNewVariation}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                        </button>
-                                    </th>
-                                    <td>$<input id="price" type="number" placeholder="0.00" step='0.01' className="input input-ghost w-full" value={newVariation.price} onChange={handleNewVariationChange} /></td>
-                                    <td><input id="quantity" type="number" placeholder="0" step='1' className="input input-ghost w-full" value={newVariation.quantity} onChange={handleNewVariationChange} /></td>
-                                    <td><input id="discountId" type="text" placeholder="None" className="input input-ghost w-full" value={newVariation.discountId || 'None'} onChange={handleNewVariationChange} /></td>
-                                    <td>
-                                        <select id="sizeId" className="select select-ghost w-full" onChange={handleNewVariationChange}>
-                                            <option selected>None</option>
+                            {/* Product Info Row 2 */}
+                            <div className='flex flex-row'>
+                                <div className='form-control w-1/2 p-4 '>
+                                    <label className='label'><span className='label-text'>Description</span></label>
+                                    <textarea id='description' className="textarea input input-bordered w-full " value={product.description} onChange={handleProductInfoChange} />
+                                </div>
+                                <div className='flex flex-row'>
+                                    <div className='form-control p-4'>
+                                        <label className='label'><span className='label-text'>Category</span></label>
+                                        <select id='category' className="select select-bordered w-full " onChange={handleCategoryChange}>
                                             {
-                                                sizes.map(s => (
-
-                                                    <option key={s.id} value={s.id}>{s.sizeValue}</option>
-                                                ))
+                                                categories.map(c => {
+                                                    return <option id={c.name} selected={c.id === product.categoryId} value={c.id}>{c.name}</option>
+                                                })
                                             }
                                         </select>
-                                    </td>
-                                </tr>
-                            </table>
-                            <table className='table w-full'>
-                                <thead>
-                                    <tr>
+                                    </div>
+                                    <div className='form-control p-4'>
+                                        <label className='label'><span className='label-text'>Active?</span></label>
+                                        <input id='active' type="checkbox" className="toggle toggle-accent toggle-lg " checked={product.active} onChange={handleProductActive} />
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            {/* VARIATIONS */}
+                            <div className='flex flex-row p-4'>
+                                <button className="btn btn-error btn-md mr-4" onClick={handleDeleteVariations}>Delete Variation(s)</button>
+                                <button className="btn btn-success btn-md mr-4" onClick={handleSaveChanges}>Save Changes</button>
+                            </div>
+                            <h1 className='px-4 py-2 font-semibold text-xl'>Variations</h1>
+                            <div className='overflow-x-auto w-full p-4 h-full'>
+                                <table className='table w-full h-100'>
+                                    <tr className='border-t-2'>
                                         <th>
-                                            <label>
-                                                <input id='checkAll' type="checkbox" className="checkbox" checked={checkAll} onChange={handleCheckAll} />
-                                            </label>
+                                            <button className="btn btn-info btn-circle btn-outline btn-sm" onClick={handleNewVariation}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </button>
                                         </th>
-                                        <th>Price</th>
-                                        <th>Quantity</th>
-                                        <th>Discount</th>
-                                        <th>Size</th>
-                                    </tr>
-                                </thead>
-                                <DragDropContext onDragEnd={onDragEnd}>
-                                    <Droppable droppableId="droppable" isDropDisabled={false}>
-                                        {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
-                                            <tbody ref={provided.innerRef}>
+                                        <td>$<input id="price" type="number" placeholder="0.00" step='0.01' className="input input-ghost w-full" value={newVariation.price} onChange={handleNewVariationChange} /></td>
+                                        <td><input id="quantity" type="number" placeholder="0" step='1' className="input input-ghost w-full" value={newVariation.quantity} onChange={handleNewVariationChange} /></td>
+                                        <td><input id="discountId" type="text" placeholder="None" className="input input-ghost w-full" value={newVariation.discountId || 'None'} onChange={handleNewVariationChange} /></td>
+                                        <td>
+                                            <select id="sizeId" className="select select-ghost w-full" onChange={handleNewVariationChange}>
+                                                <option selected>None</option>
                                                 {
-                                                    product.variations.sort((a, b) => a.displayOrder - b.displayOrder).map((variation, i) => (
-                                                        <Draggable key={variation.id} draggableId={variation.id} index={i}>
-                                                            {(dragableProvided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
-                                                                <tr
-                                                                    ref={dragableProvided.innerRef}
-                                                                    {...dragableProvided.draggableProps}
-                                                                    {...dragableProvided.dragHandleProps}
-                                                                >
-                                                                    <th>
-                                                                        <label>
-                                                                            <input id={variation.id} type="checkbox" className="checkbox" checked={checkedVariations[variation.id]} onChange={handleCheckVariation} />
-                                                                        </label>
-                                                                    </th>
-                                                                    <td>$<input data-variation-id={variation.id} data-variation-property='price' type="number" step="0.01" placeholder="0.00" className="input input-ghost w-full" value={variation.price} onChange={handleVariationChanges} /></td>
-                                                                    <td><input data-variation-id={variation.id} data-variation-property='quantity' type="number" step="1" placeholder="0" className="input input-ghost w-full" value={variation.quantity} onChange={handleVariationChanges} /></td>
-                                                                    <td><input data-variation-id={variation.id} data-variation-property='discountId' type="text" placeholder="0" className="input input-ghost w-full" value={variation.discountId || "None"} onChange={handleVariationChanges} /></td>
-                                                                    <td>
-                                                                        <select id={variation.id} className="select select-ghost w-full" onChange={handleVariationSizeSelect}>
-                                                                            <option>None</option>
-                                                                            {
-                                                                                sizes.map(s => (
-                                                                                    <option key={s.id} selected={s.id === variation.sizeId} value={s.id}>{s.sizeValue}</option>
-                                                                                ))
-                                                                            }
-                                                                        </select>
-                                                                    </td>
-                                                                </tr>
-                                                            )}
-                                                        </Draggable>
+                                                    sizes.map(s => (
+
+                                                        <option key={s.id} value={s.id}>{s.sizeValue}</option>
                                                     ))
                                                 }
-                                                {/* ADD NEW VARIATION SECTION */}
-                                            </tbody>
-                                        )}
-                                    </Droppable>
-                                </DragDropContext>
-                            </table>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table className='table w-full'>
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <label>
+                                                    <input id='checkAll' type="checkbox" className="checkbox" checked={checkAll} onChange={handleCheckAll} />
+                                                </label>
+                                            </th>
+                                            <th>Price</th>
+                                            <th>Quantity</th>
+                                            <th>Discount</th>
+                                            <th>Size</th>
+                                        </tr>
+                                    </thead>
+                                    <DragDropContext onDragEnd={onDragEnd}>
+                                        <Droppable droppableId="droppable" isDropDisabled={false}>
+                                            {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
+                                                <tbody ref={provided.innerRef}>
+                                                    {
+                                                        product.variations.sort((a, b) => a.displayOrder - b.displayOrder).map((variation, i) => (
+                                                            <Draggable key={variation.id} draggableId={variation.id} index={i}>
+                                                                {(dragableProvided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
+                                                                    <tr
+                                                                        ref={dragableProvided.innerRef}
+                                                                        {...dragableProvided.draggableProps}
+                                                                        {...dragableProvided.dragHandleProps}
+                                                                    >
+                                                                        <th>
+                                                                            <label>
+                                                                                <input id={variation.id} type="checkbox" className="checkbox" checked={checkedVariations[variation.id]} onChange={handleCheckVariation} />
+                                                                            </label>
+                                                                        </th>
+                                                                        <td>$<input data-variation-id={variation.id} data-variation-property='price' type="number" step="0.01" placeholder="0.00" className="input input-ghost w-full" value={variation.price} onChange={handleVariationChanges} /></td>
+                                                                        <td><input data-variation-id={variation.id} data-variation-property='quantity' type="number" step="1" placeholder="0" className="input input-ghost w-full" value={variation.quantity} onChange={handleVariationChanges} /></td>
+                                                                        <td><input data-variation-id={variation.id} data-variation-property='discountId' type="text" placeholder="0" className="input input-ghost w-full" value={variation.discountId || "None"} onChange={handleVariationChanges} /></td>
+                                                                        <td>
+                                                                            <select id={variation.id} className="select select-ghost w-full" onChange={handleVariationSizeSelect}>
+                                                                                <option>None</option>
+                                                                                {
+                                                                                    sizes.map(s => (
+                                                                                        <option key={s.id} selected={s.id === variation.sizeId} value={s.id}>{s.sizeValue}</option>
+                                                                                    ))
+                                                                                }
+                                                                            </select>
+                                                                        </td>
+                                                                    </tr>
+                                                                )}
+                                                            </Draggable>
+                                                        ))
+                                                    }
+                                                    {/* ADD NEW VARIATION SECTION */}
+                                                </tbody>
+                                            )}
+                                        </Droppable>
+                                    </DragDropContext>
+                                </table>
+                            </div>
                         </div>
                     </div>
+                    <button id='deleteProduct' className="btn btn-outline btn-error p-4 w-1/2 mx-auto mt-10" onClick={deleteProduct}>DELETE PRODUCT</button>
                 </div>
                 )
                 :

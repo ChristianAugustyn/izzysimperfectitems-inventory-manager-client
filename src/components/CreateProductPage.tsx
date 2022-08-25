@@ -23,9 +23,14 @@ const CreateProductPage: FC<RouteComponentProps> = () => {
     }, []);
     
     const handleProductInputChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { id, value } = event.target;
-        setNewProduct({...newProduct, [id]: value});
-        console.log(newProduct);
+        const { id, value, type } = event.target;
+
+        let newValue: string | boolean = value;
+        if (type === "checkbox") {
+            newValue = !newProduct.active;
+        }
+
+        setNewProduct({...newProduct, [id]: newValue});
     }
 
     const handleCreateNewProduct = async () => {
