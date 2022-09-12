@@ -49,8 +49,6 @@ const ProductPage: FC<RouteComponentProps> = () => {
             })
     }, []);
 
-    console.log(product?.variations);
-
     // EVENT HANDLERS
     const handleProductInfoChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { id, value } = event.target;
@@ -83,7 +81,6 @@ const ProductPage: FC<RouteComponentProps> = () => {
 
     const handleVariationSizeSelect = (event: ChangeEvent<HTMLSelectElement>) => {
         var { id, value } = event.target;
-        console.log(id, value)
         //TODO: add size change
         if (product === undefined || value === undefined) { return; }
 
@@ -306,6 +303,7 @@ const ProductPage: FC<RouteComponentProps> = () => {
         
         if (answer !== product?.name) {
             alert('Incorrect');
+            return;
         }
 
         try {

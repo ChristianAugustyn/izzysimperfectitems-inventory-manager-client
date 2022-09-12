@@ -11,6 +11,7 @@ import ProductPage from './components/ProductPage';
 import ImagesPage from './components/ImagesPage';
 import CreateProductPage from './components/CreateProductPage';
 import CreateCategoryPage from './components/CreateCategoryPage';
+import CreateSizePage from './components/CreateSizePage';
 
 
 
@@ -21,6 +22,7 @@ const routes = (
       <PrivateRoute path="/:category" component={CollectionPage}/>
       <PrivateRoute path='/create/product' component={CreateProductPage}/>
       <PrivateRoute path="/create/category" component={CreateCategoryPage}/>
+      <PrivateRoute path="/create/size" component={CreateSizePage}/>
       <PrivateRoute path='/images' component={ImagesPage}/>
       <Login path='/login'/>
     </Router>

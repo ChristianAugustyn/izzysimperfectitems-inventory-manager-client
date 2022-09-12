@@ -28,7 +28,6 @@ const login = (credentials: Credentials): Promise<boolean> => {
         .then(res => res.data as AuthResponse)
         .then(data => {
             const { token, firstName } = data
-            console.log(data);
             const storedData: StoredData = {token: token, name: firstName}
 
             localStorage.setItem(KEY, JSON.stringify(storedData))
@@ -89,6 +88,7 @@ interface ProtectedProps extends RouteComponentProps {
 }
 
 const PrivateRoute: FC<ProtectedProps> = ({ component: Component, location, ...rest }) => {
+    console.log(!validateToken() && !!location && location.pathname !== `/login`);
     if (!validateToken() && !!location && location.pathname !== `/login`) {
         navigate('/login')
         return <Login/>

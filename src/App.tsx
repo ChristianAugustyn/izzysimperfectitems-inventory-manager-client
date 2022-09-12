@@ -17,10 +17,8 @@ const App: FC<RouteComponentProps> = () => {
       .then((res: AxiosResponse) => res.data)
       .then((data: ProductInfo[]) => setProducts(data))
       .catch(err => console.error(err))
-      console.log(location.search)
   }, [location.search])
 
-  console.log(products)
   return (
       <Layout>
         <ProductsGrid products={products}/>

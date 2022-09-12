@@ -1,4 +1,4 @@
-import { RouteComponentProps } from '@reach/router';
+import { navigate, RouteComponentProps, useNavigate } from '@reach/router';
 import axios, { AxiosResponse } from 'axios';
 import React, { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Category, ProductImage, ProductV2 } from '../interfaces';
@@ -6,6 +6,7 @@ import ImagePicker, { CheckedImages } from './ImagePicker';
 import Layout from './Layout';
 
 const CreateProductPage: FC<RouteComponentProps> = () => {
+    const navigate = useNavigate();
     const [checked, setChecked] = useState<CheckedImages>({});
     const [categories, setCategories] = useState<Category[]>([]);
     const [newProduct, setNewProduct] = useState<ProductV2>({
@@ -29,7 +30,6 @@ const CreateProductPage: FC<RouteComponentProps> = () => {
         if (type === "checkbox") {
             newValue = !newProduct.active;
         }
-
         setNewProduct({...newProduct, [id]: newValue});
     }
 
@@ -50,6 +50,7 @@ const CreateProductPage: FC<RouteComponentProps> = () => {
                 }
             }
             await handleLinkImages(images, productId);
+            navigate(`/products/${productId}`, { replace: true });
         } catch (err) {
             console.error(err);
         }
@@ -96,6 +97,7 @@ const CreateProductPage: FC<RouteComponentProps> = () => {
                     <div className='form-control'>
                         <label className='label'><span className='label-text'>Category</span></label>
                         <select id='categoryId' className="select select-bordered w-full" onChange={handleProductInputChange}>
+                            <option value=""></option>
                             {
                                 categories.map(c => {
                                     return <option id={c.id} value={c.id}>{c.name}</option>

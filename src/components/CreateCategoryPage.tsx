@@ -16,7 +16,6 @@ const CreateCategoryPage: FC<RouteComponentProps> = () => {
         axios.get(`http://localhost:5000/api/v2/categories`)
         .then((res: AxiosResponse) => {
             setCategories(res.data);
-            console.log(res.data)
         }).catch(err => console.error(err));
     }, []);
 
@@ -45,12 +44,6 @@ const CreateCategoryPage: FC<RouteComponentProps> = () => {
             console.error(err);
         }
     }
-
-    // const handleEditImages = (imageDict: CheckedImages, images: ProductImage[]): boolean => {
-    //     console.log(imageDict);
-    //     setChecked(imageDict);
-    //     return true;
-    // }
 
     return (
         <Layout>

@@ -154,10 +154,13 @@ const NavBar: FC = () => {
 							className="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52"
 						>
 							<li>
-								<Link to='/create/category'>Create Category</Link>
+								<Link to='/create/category'>Manage Category</Link>
 							</li>
 							<li>
-								<Link to='/create/product'>Create Product</Link>
+								<Link to='/create/product'>Manage Product</Link>
+							</li>
+							<li>
+								<Link to='/create/size'>Manage Sizes</Link>
 							</li>
 
 						</ul>

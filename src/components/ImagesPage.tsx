@@ -84,7 +84,6 @@ const ImagesPage: FC<RouteComponentProps> = () => {
             return
         }
 
-        console.log(category);
         if (category == null || category === '') {
             return;
         }
@@ -149,8 +148,6 @@ const ImagesPage: FC<RouteComponentProps> = () => {
         if (imageKeys === "") {
             return;
         }
-
-        console.log(imageKeys);
 
         axios.delete(`http://localhost:5000/api/v2/images?${imageKeys}`)
             .then((res: AxiosResponse) => window.location.reload())
