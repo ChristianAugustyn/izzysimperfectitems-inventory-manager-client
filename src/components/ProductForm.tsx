@@ -3,7 +3,7 @@ import { Fragment, useState, useEffect, useRef, FC, ChangeEvent, SyntheticEvent,
 import noImage from "../images/product_placeholder.png";
 import axios, { AxiosRequestConfig } from 'axios'
 import { Product } from "../interfaces";
-import { getSessionInfo } from "./Auth";
+import { getSessionInfo, validateToken } from "./Auth";
 
 interface Props {
 	product: Product,
@@ -13,6 +13,7 @@ interface Props {
 }
 
 const ProductForm: FC<Props> = ({ children, product, handleProductChange, handleProductDeleted }) => {
+	validateToken();
 	//creates a DOM refference the hidden input field
 	const hiddenInput = useRef<HTMLInputElement>(null)
 
@@ -21,6 +22,7 @@ const ProductForm: FC<Props> = ({ children, product, handleProductChange, handle
 	const [file, setFile] = useState<File>()
 
 	useEffect(() => {
+
 		setFields(product);
 	}, [product]);
 

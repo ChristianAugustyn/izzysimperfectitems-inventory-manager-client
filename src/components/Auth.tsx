@@ -42,10 +42,11 @@ const login = (credentials: Credentials): Promise<boolean> => {
 
 const logout = () => {
     // console.log("LOGGED OUT")
-    localStorage.removeItem(KEY)
+    localStorage.removeItem(KEY);
+    navigate('/login');
 }
 
-const validateToken = () => {
+const validateToken = async () => {
     const rawData = localStorage.getItem(KEY)
 
     if (rawData == null){
@@ -65,11 +66,12 @@ const validateToken = () => {
             'Authorization': `Bearer ${sessionInfo.token}`
         }
     }).then(res => {
-        // console.log("TOKEN VALID")
+        console.log("TOKEN VALID")
         return true
     })
     .catch(err => {
-    //     console.log('TOKEN INVALID')
+        console.log('TOKEN INVALID')
+        logout();
         return false
     })
 }
@@ -89,7 +91,9 @@ interface ProtectedProps extends RouteComponentProps {
 }
 
 const PrivateRoute: FC<ProtectedProps> = ({ component: Component, location, ...rest }) => {
-    if (!validateToken() && !!location && location.pathname !== `/login`) {
+    validateToken();
+    if (getSessionInfo() == null && !!location && location.pathname !== `/login`) {
+        console.log("invalid, navigating to login page ...");
         navigate('/login')
         return <Login/>
     }
