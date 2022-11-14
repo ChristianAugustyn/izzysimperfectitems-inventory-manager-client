@@ -68,6 +68,17 @@ export interface ProductImage {
     modifiedAt: string
 }
 
+export interface Discount {
+    id: string,
+    name: string,
+    description: string,
+    discountType: string,
+    value: number,
+    active: boolean,
+    createdAt: string,
+    modifiedAt: string
+}
+
 export interface ProductInfo extends ProductV2 {
     catgeory: Category,
     variations: ProductVariation[],

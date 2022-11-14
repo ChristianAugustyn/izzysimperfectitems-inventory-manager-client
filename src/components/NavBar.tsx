@@ -162,6 +162,9 @@ const NavBar: FC = () => {
 							<li>
 								<Link to='/create/size'>Manage Sizes</Link>
 							</li>
+							<li>
+								<Link to='/create/discount'>Manage Discounts</Link>
+							</li>
 
 						</ul>
 					</div>

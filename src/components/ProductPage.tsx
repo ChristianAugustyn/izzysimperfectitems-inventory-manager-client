@@ -5,12 +5,14 @@ import Layout from './Layout'
 import ProductsGrid from './ProductsGrid'
 import { validateToken } from './Auth'
 import { navigate } from '@reach/router'
-import { Category, ProductImage, ProductInfo, ProductV2, ProductVariation, Size } from '../interfaces'
+import { Category, Discount, ProductImage, ProductInfo, ProductV2, ProductVariation, Size } from '../interfaces'
 import { isTemplateExpression } from 'typescript'
 import PopupMessage from './PopupMessage'
 import ImagePicker, { CheckedImages } from './ImagePicker'
 import { DragDropContext, Droppable, Draggable, DropResult, DraggableProvided, DraggableStateSnapshot, DroppableProvided, DroppableStateSnapshot, DraggingStyle, NotDraggingStyle } from 'react-beautiful-dnd';
 import { stringify } from 'querystring'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ProductPage: FC<RouteComponentProps> = () => {
 
@@ -23,6 +25,7 @@ const ProductPage: FC<RouteComponentProps> = () => {
     const [checkAll, setCheckAll] = useState<boolean>(false);
     const [checkedVariations, setCheckedVariations] = useState<{ [key: string]: boolean }>({});
     const [newVariation, setNewVariation] = useState<ProductVariation>({} as ProductVariation);
+    const [discounts, setDiscounts] = useState<Discount[]>([]);
 
     useEffect(() => {
         axios.get(`http://localhost:5000/api/v2/categories`)
@@ -46,7 +49,14 @@ const ProductPage: FC<RouteComponentProps> = () => {
             .then((data: Size[]) => setSizes(data))
             .catch(err => {
                 console.log(err);
-            })
+            });
+
+        axios.get(`http://localhost:5000/api/v2/discounts`)
+            .then((res: AxiosResponse) => res.data)
+            .then((data: Discount[]) => setDiscounts(data))
+            .catch(err => {
+                console.error(err);
+            });
     }, []);
 
     // EVENT HANDLERS
@@ -95,6 +105,19 @@ const ProductPage: FC<RouteComponentProps> = () => {
         setProduct({ ...product });
     }
 
+    const handleVariationDiscountSelect = (event: ChangeEvent<HTMLSelectElement>) => {
+        var { id, value } = event.target;
+
+        if (product === undefined || value === undefined) return;
+
+        for (const variation of product.variations) {
+            if (variation.id === id) {
+                variation.discountId = value === "None" ? null : value;
+                break;
+            }
+        }
+    }
+
     const handleCheckAll = () => {
         setCheckAll(!checkAll);
         Object.keys(checkedVariations).forEach(id => checkedVariations[id] = !checkAll)
@@ -115,6 +138,8 @@ const ProductPage: FC<RouteComponentProps> = () => {
             ...newVariation,
             [id]: type === 'number' ? parseFloat(value) : value
         })
+
+        console.log(newVariation);
     }
 
     const handleNewVariation = () => {
@@ -194,18 +219,30 @@ const ProductPage: FC<RouteComponentProps> = () => {
         if (product === undefined) {
             return;
         }
-
+        let error = false;
         //TODO: add toast component when a success or error occurs
         axios.put(`http://localhost:5000/api/v2/products/variations`, product.variations)
-            .then((res: AxiosResponse) => alert("Product Updated Successfully"))
-            .catch(err => console.error(err));
+            .then((res: AxiosResponse) => error = false )
+            .catch(err => {
+                error = true;
+            });
 
         var data: ProductV2[] = [];
         data.push(product);
 
         axios.put(`http://localhost:5000/api/v2/products`, data)
-            .then((res: AxiosResponse) => alert("Variations Updated Successfully"))
-            .catch(err => console.error(err));
+            .then((res: AxiosResponse) => error = false)
+            .catch(err => {
+                error = true;
+                console.error(err)
+            });
+        
+            if (error) {
+                toast.error('There was an issue saving the product');
+                return;
+            }
+
+            toast.success('The product was saved successfully!')
     }
 
     //DRAG AND DROP
@@ -322,7 +359,20 @@ const ProductPage: FC<RouteComponentProps> = () => {
     }
 
     return (
+        
         <Layout>
+            <ToastContainer
+                position="top-left"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable={false}
+                pauseOnHover
+                theme="light"
+            />
             <input type="checkbox" id="editImages" className="modal-toggle" />
             <div className="modal modal-bottom sm:modal-middle">
                 <div className="modal-box p-4">
@@ -423,7 +473,15 @@ const ProductPage: FC<RouteComponentProps> = () => {
                                         </th>
                                         <td>$<input id="price" type="number" placeholder="0.00" step='0.01' className="input input-ghost w-full" value={newVariation.price} onChange={handleNewVariationChange} /></td>
                                         <td><input id="quantity" type="number" placeholder="0" step='1' className="input input-ghost w-full" value={newVariation.quantity} onChange={handleNewVariationChange} /></td>
-                                        <td><input id="discountId" type="text" placeholder="None" className="input input-ghost w-full" value={newVariation.discountId || 'None'} onChange={handleNewVariationChange} /></td>
+                                        {/* <td><input id="discountId" type="text" placeholder="None" className="input input-ghost w-full" value={newVariation.discountId || 'None'} onChange={handleNewVariationChange} /></td> */}
+                                        <td>
+                                            <select id="discountId" className="select select-ghost w-full" onChange={handleNewVariationChange}>
+                                                <option selected>None</option>
+                                                {
+                                                    discounts.map(d => (<option key={d.id} value={d.id}>{d.name}</option>))
+                                                }
+                                            </select>
+                                        </td>
                                         <td>
                                             <select id="sizeId" className="select select-ghost w-full" onChange={handleNewVariationChange}>
                                                 <option selected>None</option>
@@ -471,7 +529,17 @@ const ProductPage: FC<RouteComponentProps> = () => {
                                                                         </th>
                                                                         <td>$<input data-variation-id={variation.id} data-variation-property='price' type="number" step="0.01" placeholder="0.00" className="input input-ghost w-full" value={variation.price} onChange={handleVariationChanges} /></td>
                                                                         <td><input data-variation-id={variation.id} data-variation-property='quantity' type="number" step="1" placeholder="0" className="input input-ghost w-full" value={variation.quantity} onChange={handleVariationChanges} /></td>
-                                                                        <td><input data-variation-id={variation.id} data-variation-property='discountId' type="text" placeholder="0" className="input input-ghost w-full" value={variation.discountId || "None"} onChange={handleVariationChanges} /></td>
+                                                                        {/* <td><input data-variation-id={variation.id} data-variation-property='discountId' type="text" placeholder="0" className="input input-ghost w-full" value={variation.discountId || "None"} onChange={handleVariationChanges} /></td> */}
+                                                                        <td>
+                                                                            <select id={variation.id} className="select select-ghost w-full" onChange={handleVariationDiscountSelect}>
+                                                                                <option>None</option>
+                                                                                {
+                                                                                    discounts.map(d => (
+                                                                                        <option key={d.id} selected={d.id == variation.discountId} value={d.id}>{d.name}</option>
+                                                                                    ))
+                                                                                }
+                                                                            </select>
+                                                                        </td>
                                                                         <td>
                                                                             <select id={variation.id} className="select select-ghost w-full" onChange={handleVariationSizeSelect}>
                                                                                 <option>None</option>

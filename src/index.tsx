@@ -12,6 +12,7 @@ import ImagesPage from './components/ImagesPage';
 import CreateProductPage from './components/CreateProductPage';
 import CreateCategoryPage from './components/CreateCategoryPage';
 import CreateSizePage from './components/CreateSizePage';
+import CreateDiscounts from './components/CreateDiscounts';
 
 
 
@@ -23,6 +24,7 @@ const routes = (
       <PrivateRoute path='/create/product' component={CreateProductPage}/>
       <PrivateRoute path="/create/category" component={CreateCategoryPage}/>
       <PrivateRoute path="/create/size" component={CreateSizePage}/>
+      <PrivateRoute path="/create/discount" component={CreateDiscounts}/>
       <PrivateRoute path='/images' component={ImagesPage}/>
       <Login path='/login'/>
     </Router>
