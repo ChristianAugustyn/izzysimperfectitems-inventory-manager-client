@@ -1,8 +1,10 @@
 import { RouteComponentProps } from '@reach/router';
 import axios, { AxiosResponse } from 'axios';
-import React, { FC, useEffect, useState } from 'react';
+import React, { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Discount } from '../interfaces';
 import Layout from './Layout';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface CheckedDiscount {
     [id: string]: boolean
@@ -13,6 +15,7 @@ const formateDate = (timeStamp: string): string => {
 const CreateDiscounts: FC<RouteComponentProps> = () => {
     const [discounts, setDiscounts] = useState<Discount[]>([]);
     const [discountChecked, setDiscountChecked] = useState({} as CheckedDiscount);
+    const [newDiscount, setNewDiscount] = useState<Discount>({} as Discount);
 
     const getDiscountsAsync = async () => {
         try {
@@ -39,12 +42,25 @@ const CreateDiscounts: FC<RouteComponentProps> = () => {
         getDiscountsAsync();
     }, []);
 
-    const handleChange = () => {
+    const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { id, value, type } = event.target;
+        let newValue: any = value;
+        switch (type) {
+            case "checkbox":
+                newValue = !newDiscount.active;
+                break;
+            default:
+                break;
+        }
 
+        setNewDiscount({
+            ...newDiscount,
+            [id]: newValue
+        });
+        console.log(id, value, type)
     }
 
     const createNewDiscount = () => {
-
     }
 
     const deleteDiscounts = () => {
@@ -61,22 +77,59 @@ const CreateDiscounts: FC<RouteComponentProps> = () => {
 
     return (
         <Layout>
+            <ToastContainer
+                position="top-left"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable={false}
+                pauseOnHover
+                theme="light"
+            />
             <div className='container mx-auto flex flex-col flex-wrap relative w-full h-full p-4'>
                 <div className='w-full'>
-                    <div className='form-control w-full mb-4'>
-                        <label className='label'>
-                            <span className="label-text">discount Value</span>
+                    <div className="form-control w-full">
+                        <label className="label">
+                            <span className="label-text">Name</span>
                         </label>
-                        <div className='input-group'>
-                            <input id='discountValue' type="text" placeholder="Type here" className="input input-bordered w-full" onChange={handleChange}/>
-                            <button className="btn btn-accent" onClick={createNewDiscount}>Create discount</button>
-                        </div>
+                        <input id="name" name="name" type="text" placeholder="Type here" className="input input-bordered w-full" value={newDiscount.name} onChange={handleChange}/>
+                    </div>
+                    <div className="form-control w-full">
+                        <label className="label">
+                            <span className="label-text">Description</span>
+                        </label>
+                        <textarea id="description" name="description" className="textarea textarea-bordered" placeholder="description" value={newDiscount.description} onChange={handleChange}/>                
+                    </div>
+                    <div className="form-control w-full">
+                        <label className="label">
+                            <span className="label-text">Type</span>
+                        </label>
+                        <select id="discountType" className="select select-bordered w-full">
+                            <option>None</option>
+                            <option value="dollar">dollar</option>
+                            <option value="percent">percent</option>
+                        </select>
+                    </div>
+                    <div className="form-control w-full">
+                        <label className="label">
+                            <span className="label-text">Value</span>
+                        </label>
+                        <input id="value" name="value" type="number" className="input input-bordered w-full" value={newDiscount.value} onChange={handleChange}/>
+                    </div>
+                    <div className="form-control w-full">
+                        <label className="label">
+                            <span className="label-text">Active</span>
+                        </label>
+                        <input id="active" type="checkbox" className="toggle toggle-accent" checked={newDiscount.active} onChange={handleChange}/>
                     </div>
                 </div>
-                
+                <button className="btn btn-success" onClick={() => createNewDiscount()}>Create Discount</button>
                 <h2 className='text-xl mt-4'>discounts</h2>
-                <button className='btn btn-sm btn-error w-1/6 my-4' onClick={deleteDiscounts}>DELETE discount(S)</button>
-                <table className='table table-compact w-full'>
+                <button className='btn btn-sm btn-error w-1/6 my-4' onClick={deleteDiscounts}>DELETE DISCOUNT(S)</button>
+                <table className='table table-compact'>
                     <thead>
                         <tr>
                             <th>
