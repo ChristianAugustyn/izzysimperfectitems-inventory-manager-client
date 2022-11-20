@@ -88,14 +88,16 @@ const CreateSizePage: FC<RouteComponentProps> = () => {
     const deleteSizes = async () => {
         //get all selected sizes into an array
         console.log('handle delete sizes');
-        let sizesToDelete: string[] = Object.entries(sizeChecked).filter(([id, checked]) => checked === true).map(([id, checked]: [string, boolean]): string => id);
+        let sizesToDelete: string[] = Object.entries(sizeChecked)
+            .filter(([id, checked]) => checked === true)
+            .map(([id, checked]: [string, boolean]): string => id);
         //build query string
         let queryString = '';
         sizesToDelete.forEach(sizeId => queryString += `id=${sizeId}&`);
         
         try {
             let res: AxiosResponse = await axios.delete(`http://localhost:5000/api/v2/sizes?${queryString}`);
-
+            
             if (res.status !== 200) {
                 alert("there was an issue deleting the sizes");
                 return;

@@ -40,7 +40,7 @@ const CreateDiscounts: FC<RouteComponentProps> = () => {
 
     useEffect(() => {
         getDiscountsAsync();
-    }, []);
+    });
 
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { id, value, type } = event.target;
@@ -83,16 +83,43 @@ const CreateDiscounts: FC<RouteComponentProps> = () => {
         }
     }
 
-    const deleteDiscounts = () => {
+    const deleteDiscounts = async () => {
+        console.log("Deleting discounts...");
+        let discountsToDelete: string[] = Object.entries(discountChecked)
+            .filter(([id, checked]) => checked === true)
+            .map(([id, checked]: [string, boolean]): string => id);
 
+        let queryString = '';
+        discountsToDelete.forEach(discountId => queryString += `id=${discountId}&`);
+        
+        try {
+            let res: AxiosResponse = await axios.delete(`http://localhost:5000/api/v2/discounts?${queryString}`);
+            console.log(res);
+            if (res.status !== 200) {
+                toast.error(`There was an issue deleting the items selected\n${res.statusText}`);
+                return;
+            }
+            
+            toast.success("The items were successfully deleted");
+            getDiscountsAsync();
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                toast.error(err.response?.data.message);
+            }
+            console.error(err);
+        }
     }
 
-    const handleCheckAll = () => {
-
+    const handleCheckAll = (event: ChangeEvent<HTMLInputElement>) => {
+        const { checked } = event.target;
+        let newDiscountChecked: CheckedDiscount = {};
+        Object.entries(discountChecked).forEach(([id, checkedValue]: [string, boolean]) => newDiscountChecked[id] = checked);
+        setDiscountChecked({...newDiscountChecked});
     }
 
-    const handleChecked = () => {
-
+    const handleChecked = (event: ChangeEvent<HTMLInputElement>) => {
+        const { id } = event.target;
+        setDiscountChecked({...discountChecked, [id]: !discountChecked[id]});
     }
 
     return (
@@ -146,8 +173,8 @@ const CreateDiscounts: FC<RouteComponentProps> = () => {
                         <input id="active" type="checkbox" className="toggle toggle-accent" checked={newDiscount.active} onChange={handleChange}/>
                     </div>
                 </div>
-                <button className="btn btn-success my-3" onClick={createNewDiscount}>Create Discount</button>
-                <h2 className='text-xl mt-4'>discounts</h2>
+                <button className="btn btn-success my-3 w-full" onClick={createNewDiscount}>Create Discount</button>
+                <h2 className='text-xl mt-4'>Discounts</h2>
                 <button className='btn btn-sm btn-error w-1/6 my-4' onClick={deleteDiscounts}>DELETE DISCOUNT(S)</button>
                 <table className='table table-compact'>
                     <thead>

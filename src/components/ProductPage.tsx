@@ -1,19 +1,13 @@
-import axios, { Axios, AxiosResponse } from 'axios'
-import React, { useState, useEffect, FC, ChangeEvent, useRef } from 'react'
+import axios, { AxiosResponse } from 'axios'
+import React, { useState, useEffect, FC, ChangeEvent } from 'react'
 import { RouteComponentProps, useParams } from '@reach/router'
 import Layout from './Layout'
-import ProductsGrid from './ProductsGrid'
-import { validateToken } from './Auth'
-import { navigate } from '@reach/router'
 import { Category, Discount, ProductImage, ProductInfo, ProductV2, ProductVariation, Size } from '../interfaces'
-import { isTemplateExpression } from 'typescript'
-import PopupMessage from './PopupMessage'
 import ImagePicker, { CheckedImages } from './ImagePicker'
-import { DragDropContext, Droppable, Draggable, DropResult, DraggableProvided, DraggableStateSnapshot, DroppableProvided, DroppableStateSnapshot, DraggingStyle, NotDraggingStyle } from 'react-beautiful-dnd';
-import { stringify } from 'querystring'
+import { DragDropContext, Droppable, Draggable, DropResult, DraggableProvided, DraggableStateSnapshot, DroppableProvided, DroppableStateSnapshot } from 'react-beautiful-dnd';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+/* eslint-disable */
 const ProductPage: FC<RouteComponentProps> = () => {
 
     const params = useParams();
@@ -24,7 +18,16 @@ const ProductPage: FC<RouteComponentProps> = () => {
     const [sizes, setSizes] = useState<Size[]>([]);
     const [checkAll, setCheckAll] = useState<boolean>(false);
     const [checkedVariations, setCheckedVariations] = useState<{ [key: string]: boolean }>({});
-    const [newVariation, setNewVariation] = useState<ProductVariation>({} as ProductVariation);
+    const [newVariation, setNewVariation] = useState<ProductVariation>({
+        id: "",
+        productId: "",
+        sizeId: null,
+        discountId: null,
+        quantity: 0,
+        price: 0,
+        displayOrder: 0,
+        size: null
+    });
     const [discounts, setDiscounts] = useState<Discount[]>([]);
 
     useEffect(() => {

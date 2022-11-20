@@ -1,6 +1,6 @@
-import { navigate, useLocation, RouteComponentProps } from '@reach/router'
+import { navigate, RouteComponentProps } from '@reach/router'
 import axios from 'axios'
-import { FC, useEffect, useState } from 'react'
+import { FC } from 'react'
 import Login from './Login'
 
 const KEY = "izzys-inventory-manager"
@@ -23,7 +23,7 @@ interface AuthResponse {
 }
 
 const login = (credentials: Credentials): Promise<boolean> => {
-    const { username, password } = credentials
+    // const { username, password } = credentials
     return axios.post('http://localhost:5000/api/v2/auth/login', credentials)
         .then(res => res.data as AuthResponse)
         .then(data => {

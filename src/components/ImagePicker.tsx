@@ -1,4 +1,3 @@
-import { Link } from '@reach/router';
 import axios, { AxiosResponse } from 'axios';
 import React, { ChangeEvent, FC, useEffect, useState } from 'react';
 import { ProductImage } from '../interfaces';
@@ -60,7 +59,7 @@ const ImagePicker: FC<Props> = ({ checkedImages, onChange }) => {
                 <tbody>
                     {
                         images.length > 0 && images.map((img: ProductImage, i: number) => (
-                            <tr>
+                            <tr key={i}>
                                 <th>
                                     <label>
                                         <input id={img.id} type="checkbox" className="checkbox" checked={checked[img.id]} onChange={handleImageChecked}/>
@@ -78,7 +77,7 @@ const ImagePicker: FC<Props> = ({ checkedImages, onChange }) => {
                                 {img.productId == null ? 
                                     <td><span className='badge badge-error'>none</span></td> 
                                     :
-                                    <td><a href={`/products/${img.productId}`} target='_blank'><span className='badge badge-info'>{img.productId}</span></a></td>
+                                    <td><a href={`/products/${img.productId}`} target='_blank' rel="noreferrer"><span className='badge badge-info'>{img.productId}</span></a></td>
                                 }
                             </tr>
                         ))

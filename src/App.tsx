@@ -3,7 +3,7 @@ import { FC, useEffect, useState } from "react";
 import Layout from "./components/Layout";
 import ProductsGrid from "./components/ProductsGrid";
 import { RouteComponentProps, useLocation } from "@reach/router";
-import { Product, ProductInfo } from "./interfaces";
+import { ProductInfo } from "./interfaces";
 import { AxiosResponse } from "axios";
 import { parse } from 'query-string';
 
@@ -17,7 +17,7 @@ const App: FC<RouteComponentProps> = () => {
       .then((res: AxiosResponse) => res.data)
       .then((data: ProductInfo[]) => setProducts(data))
       .catch(err => console.error(err))
-  }, [location.search])
+  }, [searchParams])
 
   return (
       <Layout>

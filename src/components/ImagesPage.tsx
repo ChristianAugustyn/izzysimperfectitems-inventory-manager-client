@@ -1,6 +1,6 @@
 import { Link, RouteComponentProps } from '@reach/router';
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import React, { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Category, ProductImage, S3Object } from '../interfaces';
 import { CheckedImages } from './ImagePicker';
 import Layout from './Layout';
@@ -8,7 +8,7 @@ import FileDragAndDrop from './util/FilesDragAndDrop';
 
 const ImagesPage: FC<RouteComponentProps> = () => {
 
-    const hiddenInput = useRef<HTMLInputElement>(null)
+    // const hiddenInput = useRef<HTMLInputElement>(null)
     const [images, setImages] = useState<ProductImage[]>([]);
     const [awsImages, setAwsImages] = useState<S3Object[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -56,22 +56,22 @@ const ImagesPage: FC<RouteComponentProps> = () => {
         setChecked(updatedChecked);
     }
 
-    const handleFileClick = () => {
-		//when the user clicks the change image button, it clicks hidden input
-		if (hiddenInput.current !== null){
-			hiddenInput.current.click();
-		}
-	}
+    // const handleFileClick = () => {
+	// 	//when the user clicks the change image button, it clicks hidden input
+	// 	if (hiddenInput.current !== null){
+	// 		hiddenInput.current.click();
+	// 	}
+	// }
 
-    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-		//updates the state of the file uploaded
-		if (event.target.files === null){
-			return;
-		}
+    // const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+	// 	//updates the state of the file uploaded
+	// 	if (event.target.files === null){
+	// 		return;
+	// 	}
 
-        const fileUploaded = event.target.files[0]
-		setFile(fileUploaded);
-	}
+    //     const fileUploaded = event.target.files[0]
+	// 	setFile(fileUploaded);
+	// }
 
     const handleCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
         const { value } = event.target;

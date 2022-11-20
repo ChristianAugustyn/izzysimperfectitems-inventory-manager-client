@@ -1,4 +1,4 @@
-import React, { Component, DragEventHandler, FC, ReactNode, SetStateAction, useEffect, useRef, useState } from 'react';
+import React, { FC, ReactNode, SetStateAction, useRef, useState } from 'react';
 import { Dispatch } from 'react';
 
 interface Props {

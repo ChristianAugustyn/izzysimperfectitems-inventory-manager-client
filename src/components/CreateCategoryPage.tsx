@@ -1,8 +1,7 @@
 import { RouteComponentProps } from "@reach/router";
-import axios, { AxiosResponse, AxiosResponseTransformer } from "axios";
+import axios, { AxiosResponse } from "axios";
 import { ChangeEvent, FC, useEffect, useState } from "react";
-import { Category, Product, ProductImage } from "../interfaces";
-import ImagePicker, { CheckedImages } from "./ImagePicker";
+import { Category } from "../interfaces";
 import Layout from "./Layout";
 
 

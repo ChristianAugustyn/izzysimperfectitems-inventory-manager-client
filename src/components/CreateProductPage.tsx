@@ -1,4 +1,4 @@
-import { navigate, RouteComponentProps, useNavigate } from '@reach/router';
+import { RouteComponentProps, useNavigate } from '@reach/router';
 import axios, { AxiosResponse } from 'axios';
 import React, { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Category, ProductImage, ProductV2 } from '../interfaces';
